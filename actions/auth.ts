@@ -24,6 +24,11 @@ export async function saveApiKey(formData: FormData) {
 
   // Fire-and-forget Langfuse trace — failure never surfaces to user
   try {
+    console.log('[langfuse] attempting trace — keys present:', {
+      secret: !!process.env.LANGFUSE_SECRET_KEY,
+      public: !!process.env.LANGFUSE_PUBLIC_KEY,
+      baseUrl: process.env.LANGFUSE_BASEURL,
+    })
     const { Langfuse } = await import('langfuse')
     const langfuse = new Langfuse({
       secretKey: process.env.LANGFUSE_SECRET_KEY,
@@ -37,8 +42,9 @@ export async function saveApiKey(formData: FormData) {
     })
     trace.event({ name: 'key_stored', metadata: { provider } })
     await langfuse.flushAsync()
-  } catch {
-    // Langfuse failure must never block the user flow
+    console.log('[langfuse] trace flushed successfully')
+  } catch (err) {
+    console.error('[langfuse] trace failed:', err)
   }
 
   redirect('/dashboard')
