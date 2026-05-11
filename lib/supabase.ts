@@ -33,10 +33,4 @@ export function createAuthClient() {
   )
 }
 
-// Browser client — Client Components only, anon key, RLS enforced
-export function createBrowserClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
+// Browser client lives in lib/supabase.client.ts to avoid importing next/headers in client components

@@ -1,6 +1,6 @@
 'use client'
 
-import { createBrowserClient } from '@/lib/supabase'
+import { createBrowserClient } from '@/lib/supabase.client'
 import { useState } from 'react'
 
 export default function GitHubSignInButton() {
