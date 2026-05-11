@@ -6,7 +6,12 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
 
+  console.log('[auth/callback] full URL:', request.url)
+  console.log('[auth/callback] code present:', !!code)
+  console.log('[auth/callback] all params:', Object.fromEntries(searchParams.entries()))
+
   if (!code) {
+    console.error('[auth/callback] FAIL: no code in URL params')
     return NextResponse.redirect(`${origin}/?error=auth_failed`)
   }
 
@@ -15,8 +20,11 @@ export async function GET(request: NextRequest) {
   // Exchange the code for a session — this is the required step with PKCE flow
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
+  console.log('[auth/callback] exchangeCodeForSession error:', error?.message ?? 'none')
+  console.log('[auth/callback] session present:', !!data.session)
+
   if (error || !data.session) {
-    console.error('Auth callback error:', error?.message)
+    console.error('[auth/callback] FAIL: exchange failed:', error?.message)
     return NextResponse.redirect(`${origin}/?error=auth_failed`)
   }
 
@@ -24,7 +32,9 @@ export async function GET(request: NextRequest) {
 
   // CRITICAL: provider_token is only available here at exchange time — never again
   const githubToken = session.provider_token
+  console.log('[auth/callback] provider_token present:', !!githubToken)
   if (!githubToken) {
+    console.error('[auth/callback] FAIL: no provider_token in session')
     return NextResponse.redirect(`${origin}/?error=token_missing`)
   }
 
