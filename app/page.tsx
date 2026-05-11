@@ -28,11 +28,11 @@ export default async function LandingPage({
           Abhyas<span style={{ color: '#3d6b4f' }}>.ai</span>
         </span>
         <a href="https://tapovan.ai" className="text-sm" style={{ color: '#6b6b6b' }}>
-          ← Tapovan.ai
+          Tapovan.ai
         </a>
       </nav>
 
-      {/* ── 1. HERO ── */}
+      {/* 1. HERO */}
       <section className="max-w-4xl mx-auto px-8 py-28 text-center space-y-8">
         <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#3d6b4f' }}>
           For developers who want to actually get good
@@ -43,7 +43,7 @@ export default async function LandingPage({
         </h1>
         <p className="text-xl leading-relaxed max-w-2xl mx-auto" style={{ color: '#6b6b6b' }}>
           You wouldn't ask a personal trainer to lift the weights for you.
-          Abhyas is your AI-powered training ground — real projects, real problems,
+          Abhyas is your AI-powered training ground. Real projects, real problems,
           real growth. You do the reps.
         </p>
         <div className="flex flex-col items-center gap-3 pt-2">
@@ -57,7 +57,7 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* ── 2. THE GYM METAPHOR ── */}
+      {/* 2. THE GYM METAPHOR */}
       <section style={{ backgroundColor: '#ffffff', borderTop: '1px solid #ddd8cf', borderBottom: '1px solid #ddd8cf' }}>
         <div className="max-w-4xl mx-auto px-8 py-20 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="space-y-5">
@@ -75,7 +75,7 @@ export default async function LandingPage({
           </div>
           <div className="space-y-4">
             {[
-              { a: 'Copy AI output', b: 'Understand what you\'re building' },
+              { a: 'Copy AI output', b: "Understand what you're building" },
               { a: 'Watch tutorials', b: 'Finish a real project' },
               { a: 'Ask AI to fix bugs', b: 'Learn why the bug happened' },
               { a: 'Follow along', b: 'Work through it yourself' },
@@ -93,7 +93,7 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* ── 3. HOW IT WORKS ── */}
+      {/* 3. HOW IT WORKS */}
       <section className="max-w-4xl mx-auto px-8 py-24 space-y-16">
         <div className="text-center space-y-3">
           <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#9b9b9b' }}>How it works</p>
@@ -108,17 +108,17 @@ export default async function LandingPage({
             {
               step: '01',
               title: 'Choose your starting point',
-              desc: 'Tell Abhyas what you want to build and where you\'re starting from. Beginner, intermediate, or advanced — you get a project scoped to your level, not a watered-down version of someone else\'s.',
+              desc: "Tell Abhyas what you want to build and where you're starting from. Beginner, intermediate, or advanced. You get a project scoped to your level, not a watered-down version of someone else's.",
             },
             {
               step: '02',
               title: 'Get a problem to solve',
-              desc: 'You get a real problem statement, broken into milestones you can actually finish. Each milestone ends with something testable — not a vague "good job."',
+              desc: 'You get a real problem statement, broken into milestones you can actually finish. Each milestone ends with something testable, not a vague "good job."',
             },
             {
               step: '03',
               title: 'Build on your machine',
-              desc: 'You set up the stack, hit real errors, and fix them. When you\'re genuinely stuck, ask for a nudge. You get a direction — never the solution. Your repo, your code, your understanding.',
+              desc: "You set up the stack, hit real errors, and fix them. When you're genuinely stuck, ask for a nudge. You get a direction, never the solution. Your repo, your code, your understanding.",
             },
           ].map((item) => (
             <div key={item.step} className="rounded-xl p-7 space-y-4" style={{ backgroundColor: '#ffffff', border: '1px solid #ddd8cf' }}>
@@ -130,7 +130,7 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* ── 4. WHAT A PROJECT LOOKS LIKE ── */}
+      {/* 4. THREE LEVELS */}
       <section style={{ backgroundColor: '#ffffff', borderTop: '1px solid #ddd8cf', borderBottom: '1px solid #ddd8cf' }}>
         <div className="max-w-4xl mx-auto px-8 py-20 space-y-14">
           <div className="text-center space-y-3">
@@ -148,20 +148,20 @@ export default async function LandingPage({
                 badge: '#d1fae5',
                 badgeText: '#065f46',
                 promise: 'Get your first real project shipped',
-                what: 'Clear problem statement. Guided milestones. Concepts introduced one at a time. You\'ll build something that works and understand why it works.',
+                what: "Clear problem statement. Guided milestones. Concepts introduced one at a time. You'll build something that works and understand why it works.",
               },
               {
                 level: 'Intermediate',
                 badge: '#fef3c7',
                 badgeText: '#92400e',
-                promise: 'Go deeper than you\'ve gone before',
-                what: 'Fewer guardrails. More ambiguity. The problem statement is real — the path to the solution is yours to find. You\'ll hit walls. That\'s the point.',
+                promise: "Go deeper than you've gone before",
+                what: "Fewer guardrails. More ambiguity. The problem statement is real, the path to the solution is yours to find. You'll hit walls. That's the point.",
               },
               {
                 level: 'Advanced',
                 badge: '#ede9fe',
                 badgeText: '#5b21b6',
-                promise: 'Build something you\'d actually show in an interview',
+                promise: "Build something you'd actually show in an interview",
                 what: 'Open-ended problem. Production considerations. You make the architectural calls. The AI challenges your decisions, not just your implementation.',
               },
             ].map((p) => (
@@ -177,14 +177,14 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* ── 5. THE NUDGE ── */}
+      {/* 5. THE NUDGE */}
       <section className="max-w-3xl mx-auto px-8 py-24 text-center space-y-6">
         <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#9b9b9b' }}>When you're stuck</p>
         <h2 className="font-serif text-3xl font-bold">
           Help is always there.<br />The solution never is.
         </h2>
         <p className="text-lg leading-relaxed" style={{ color: '#6b6b6b' }}>
-          Ask for a nudge and you get a reframe, a direction, or a concrete pointer — whichever level you need.
+          Ask for a nudge and you get a reframe, a direction, or a concrete pointer, whichever level you need.
           The AI will ask clarifying questions, challenge your assumptions, and point you at the right door.
           It will never open it for you.
         </p>
@@ -193,7 +193,7 @@ export default async function LandingPage({
         </p>
       </section>
 
-      {/* ── 6. CTA ── */}
+      {/* 6. CTA */}
       <section style={{ backgroundColor: '#3d6b4f' }} className="px-8 py-20">
         <div className="max-w-xl mx-auto text-center space-y-6">
           <h2 className="font-serif text-3xl font-bold" style={{ color: '#ffffff' }}>
@@ -225,4 +225,3 @@ export default async function LandingPage({
     </div>
   )
 }
-

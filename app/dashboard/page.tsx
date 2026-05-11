@@ -16,23 +16,30 @@ export default async function DashboardPage() {
   if (!user?.encrypted_api_key) redirect('/onboarding')
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center px-4">
-      <div className="max-w-2xl w-full space-y-6 text-center">
+    <div className="min-h-screen" style={{ backgroundColor: '#f7f4ef', color: '#1c1c1c' }}>
+      {/* Nav */}
+      <nav style={{ borderBottom: '1px solid #ddd8cf' }} className="flex items-center justify-between px-8 py-5">
+        <span className="font-serif text-lg font-semibold">
+          Abhyas<span style={{ color: '#3d6b4f' }}>.ai</span>
+        </span>
         {user.github_avatar && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={user.github_avatar}
-            alt={user.github_username ?? 'Avatar'}
-            className="w-14 h-14 rounded-full mx-auto"
-          />
+          <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={user.github_avatar} alt={user.github_username ?? ''} className="w-7 h-7 rounded-full" />
+            <span className="text-sm" style={{ color: '#6b6b6b' }}>@{user.github_username}</span>
+          </div>
         )}
-        <h1 className="text-3xl font-semibold">
-          Welcome, {user.github_username}
+      </nav>
+
+      {/* Content */}
+      <main className="max-w-4xl mx-auto px-8 py-24 text-center space-y-6">
+        <h1 className="font-serif text-4xl font-bold">
+          Welcome back, {user.github_username}.
         </h1>
-        <p className="text-zinc-500 text-sm">
-          Phase 3 — project ideas coming soon.
+        <p style={{ color: '#6b6b6b' }}>
+          Your projects will appear here. Topic entry is coming in the next phase.
         </p>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
