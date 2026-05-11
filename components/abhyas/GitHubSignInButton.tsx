@@ -22,7 +22,10 @@ export default function GitHubSignInButton() {
     <button
       onClick={handleSignIn}
       disabled={loading}
-      className="inline-flex items-center gap-3 bg-forest text-white font-medium py-3 px-6 rounded-lg hover:bg-forest-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      className="inline-flex items-center gap-3 font-medium py-3 px-6 rounded-lg transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+      style={{ backgroundColor: '#3d6b4f', color: '#ffffff' }}
+      onMouseEnter={e => !loading && ((e.target as HTMLElement).style.backgroundColor = '#2e5340')}
+      onMouseLeave={e => !loading && ((e.target as HTMLElement).style.backgroundColor = '#3d6b4f')}
     >
       <GitHubIcon />
       {loading ? 'Redirecting…' : 'Continue with GitHub'}

@@ -120,7 +120,8 @@ export default function ApiKeyForm() {
       <button
         type="submit"
         disabled={pending || !provider || !key.trim()}
-        className="w-full bg-forest text-white font-medium py-3 px-6 rounded-lg hover:bg-forest-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full font-medium py-3 px-6 rounded-lg transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{ backgroundColor: '#3d6b4f', color: '#ffffff' }}
       >
         {pending
           ? 'Saving…'
