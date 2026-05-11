@@ -1,5 +1,4 @@
--- Enable UUID generation
-create extension if not exists "uuid-ossp";
+-- gen_random_uuid() is built into Postgres 13+ — no extension needed
 
 -- USERS
 create table public.users (
@@ -17,7 +16,7 @@ create table public.users (
 
 -- PROJECTS
 create table public.projects (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.users(id) on delete cascade,
   topic text not null,
   title text not null,
@@ -30,7 +29,7 @@ create table public.projects (
 
 -- MILESTONES
 create table public.milestones (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   project_id uuid not null references public.projects(id) on delete cascade,
   title text not null,
   description text not null,
@@ -45,7 +44,7 @@ create table public.milestones (
 
 -- TASKS
 create table public.tasks (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   milestone_id uuid not null references public.milestones(id) on delete cascade,
   title text not null,
   description text not null,
@@ -60,7 +59,7 @@ create table public.tasks (
 
 -- NUDGE SESSIONS
 create table public.nudge_sessions (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   task_id uuid not null references public.tasks(id) on delete cascade,
   user_id uuid not null references public.users(id) on delete cascade,
   stuck_description text not null,
@@ -73,7 +72,7 @@ create table public.nudge_sessions (
 
 -- VERIFICATION RUNS
 create table public.verification_runs (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   milestone_id uuid not null references public.milestones(id) on delete cascade,
   user_id uuid not null references public.users(id) on delete cascade,
   status text not null check (status in ('complete', 'partial', 'incorrect', 'cannot_assess')),
@@ -85,7 +84,7 @@ create table public.verification_runs (
 
 -- COMPLETION POSTS
 create table public.completion_posts (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   project_id uuid not null references public.projects(id) on delete cascade,
   user_id uuid not null references public.users(id) on delete cascade,
   project_summary text not null,
