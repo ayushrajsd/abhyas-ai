@@ -3,7 +3,7 @@
 import { createBrowserClient } from '@/lib/supabase.client'
 import { useState } from 'react'
 
-export default function GitHubSignInButton() {
+export default function GitHubSignInButton({ variant = 'dark' }: { variant?: 'dark' | 'light' }) {
   const [loading, setLoading] = useState(false)
 
   async function handleSignIn() {
@@ -18,14 +18,18 @@ export default function GitHubSignInButton() {
     })
   }
 
+  const bg = variant === 'light' ? '#ffffff' : '#3d6b4f'
+  const fg = variant === 'light' ? '#3d6b4f' : '#ffffff'
+  const hoverBg = variant === 'light' ? '#f0fdf4' : '#2e5340'
+
   return (
     <button
       onClick={handleSignIn}
       disabled={loading}
       className="inline-flex items-center gap-3 font-medium py-3 px-6 rounded-lg transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
-      style={{ backgroundColor: '#3d6b4f', color: '#ffffff' }}
-      onMouseEnter={e => !loading && ((e.target as HTMLElement).style.backgroundColor = '#2e5340')}
-      onMouseLeave={e => !loading && ((e.target as HTMLElement).style.backgroundColor = '#3d6b4f')}
+      style={{ backgroundColor: bg, color: fg }}
+      onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLElement).style.backgroundColor = hoverBg }}
+      onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLElement).style.backgroundColor = bg }}
     >
       <GitHubIcon />
       {loading ? 'Redirecting…' : 'Continue with GitHub'}
