@@ -104,6 +104,14 @@ Skill level: ${validated.skillLevel}${
   const model = getModel(provider, 'fast')
   let fullResponse = ''
   const yieldedCount = { value: 0 }
+  const startTime = Date.now()
+
+  const generation = trace.generation({
+    name: 'agent_1_project_ideator_generation',
+    model,
+    input: [{ role: 'user', content: prompt }],
+    modelParameters: { max_tokens: 4096 },
+  })
 
   try {
     if (provider === 'anthropic') {
@@ -124,8 +132,20 @@ Skill level: ${validated.skillLevel}${
           yield* extractCompleteProjects(fullResponse, yieldedCount)
         }
       }
+
+      const finalMsg = await stream.finalMessage()
+      generation.end({
+        output: fullResponse,
+        usage: {
+          input:  finalMsg.usage.input_tokens,
+          output: finalMsg.usage.output_tokens,
+        },
+      })
     } else {
       const client = new OpenAI({ apiKey })
+      let inputTokens = 0
+      let outputTokens = 0
+
       const stream = await client.responses.create({
         model,
         stream: true,
@@ -138,7 +158,16 @@ Skill level: ${validated.skillLevel}${
           fullResponse += chunk.delta
           yield* extractCompleteProjects(fullResponse, yieldedCount)
         }
+        if (chunk.type === 'response.completed') {
+          inputTokens  = chunk.response.usage?.input_tokens  ?? 0
+          outputTokens = chunk.response.usage?.output_tokens ?? 0
+        }
       }
+
+      generation.end({
+        output: fullResponse,
+        usage: { input: inputTokens, output: outputTokens },
+      })
     }
 
     // Final validation of complete output
@@ -147,9 +176,15 @@ Skill level: ${validated.skillLevel}${
 
     trace.update({
       output: { projectCount: parsed.length },
-      metadata: { model, provider, responseLength: fullResponse.length },
+      metadata: {
+        model,
+        provider,
+        responseLength: fullResponse.length,
+        latencyMs: Date.now() - startTime,
+      },
     })
   } catch (err) {
+    generation.end({ output: String(err), level: 'ERROR' })
     trace.update({ metadata: { error: String(err) } })
     throw err
   } finally {
