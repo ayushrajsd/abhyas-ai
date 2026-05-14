@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { TopicEntry } from '@/components/abhyas/TopicEntry'
 import { ProjectIdeaCard } from '@/components/abhyas/ProjectIdeaCard'
-import { generateProjectIdeas, selectProject } from '@/actions/agents'
+import { selectProject } from '@/actions/agents'
 import type { ProjectIdea } from '@/schemas/agents'
 
 export function DashboardClient() {
@@ -22,8 +22,19 @@ export function DashboardClient() {
     setTopic(submittedTopic)
 
     try {
-      const stream = await generateProjectIdeas(submittedTopic, skillLevel)
-      const reader = stream.getReader()
+      const res = await fetch('/api/projects/ideate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: submittedTopic, skillLevel }),
+      })
+
+      if (!res.ok) {
+        const { error } = await res.json() as { error: string }
+        if (error?.includes('onboarding')) { router.push('/onboarding'); return }
+        throw new Error(error ?? 'Something went wrong')
+      }
+
+      const reader = res.body!.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
 
@@ -46,12 +57,7 @@ export function DashboardClient() {
         }
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong'
-      if (message.includes('onboarding')) {
-        router.push('/onboarding')
-      } else {
-        setError(message)
-      }
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setIsLoading(false)
     }
