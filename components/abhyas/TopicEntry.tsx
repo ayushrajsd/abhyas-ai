@@ -24,7 +24,7 @@ export function TopicEntry({ onSubmit, isLoading }: TopicEntryProps) {
       <div className="space-y-2">
         <label
           htmlFor="topic-input"
-          className="block font-serif text-2xl font-semibold"
+          className="block font-serif text-3xl font-bold"
           style={{ color: '#1c1c1c' }}
         >
           What do you want to build?

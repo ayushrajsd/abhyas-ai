@@ -7,7 +7,7 @@ import { ProjectIdeaCard } from '@/components/abhyas/ProjectIdeaCard'
 import { selectProject } from '@/actions/agents'
 import type { ProjectIdea } from '@/schemas/agents'
 
-export function DashboardClient() {
+export function DashboardClient({ username }: { username: string }) {
   const router = useRouter()
   const [topic, setTopic] = useState('')
   const [projects, setProjects] = useState<ProjectIdea[]>([])
@@ -79,13 +79,12 @@ export function DashboardClient() {
     <div className="space-y-10">
       {/* Topic entry: collapses to a compact strip once results arrive */}
       {!hasResults ? (
-        <div className="space-y-2">
-          <p
-            className="text-xs font-medium uppercase tracking-widest"
-            style={{ color: '#3d6b4f' }}
-          >
-            अभ्यासेन · learn by building
-          </p>
+        <div className="space-y-5">
+          {username && (
+            <p className="text-sm" style={{ color: '#6b6b6b' }}>
+              Good to have you back, <span className="font-medium" style={{ color: '#3d6b4f' }}>@{username}</span>
+            </p>
+          )}
           <TopicEntry onSubmit={handleSubmit} isLoading={isLoading} />
         </div>
       ) : (

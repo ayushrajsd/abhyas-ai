@@ -18,7 +18,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f7f4ef', color: '#1c1c1c' }}>
-      {/* Thin accent bar at top */}
       <div style={{ height: 3, background: 'linear-gradient(90deg, #3d6b4f 0%, #7ab394 60%, #f7f4ef 100%)' }} />
 
       <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #e8e3da' }}>
@@ -39,29 +38,8 @@ export default async function DashboardPage() {
         )}
       </nav>
 
-      {/* Hero */}
-      <div
-        className="px-8 py-10"
-        style={{
-          background: 'linear-gradient(180deg, #eef6f1 0%, #f7f4ef 100%)',
-          borderBottom: '1px solid #e8e3da',
-        }}
-      >
-        <div className="max-w-4xl mx-auto">
-          <p className="text-sm" style={{ color: '#6b6b6b' }}>
-            Good to have you back, <span className="font-medium" style={{ color: '#3d6b4f' }}>@{user.github_username}</span>
-          </p>
-          <h1 className="font-serif text-2xl font-bold mt-1" style={{ color: '#1c1c1c' }}>
-            What will you build?
-          </h1>
-          <p className="text-sm mt-1" style={{ color: '#9b9b9b' }}>
-            Pick a project. Work through it. The understanding arrives when it arrives.
-          </p>
-        </div>
-      </div>
-
-      <main className="max-w-4xl mx-auto px-8 py-10">
-        <DashboardClient />
+      <main className="max-w-4xl mx-auto px-8 py-16">
+        <DashboardClient username={user.github_username ?? ''} />
       </main>
     </div>
   )
