@@ -101,7 +101,11 @@ export function DashboardClient() {
           </div>
           {!isLoading && (
             <button
-              onClick={() => { setProjects([]); setError(null) }}
+              onClick={() => {
+                setProjects([])
+                setError(null)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
               className="text-xs underline underline-offset-2"
               style={{ color: '#3d6b4f' }}
             >

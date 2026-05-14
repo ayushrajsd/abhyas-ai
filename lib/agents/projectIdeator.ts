@@ -113,6 +113,8 @@ Skill level: ${validated.skillLevel}${
     modelParameters: { max_tokens: 4096 },
   })
 
+  let generationEnded = false
+
   try {
     if (provider === 'anthropic') {
       const client = new Anthropic({ apiKey })
@@ -133,14 +135,18 @@ Skill level: ${validated.skillLevel}${
         }
       }
 
-      const finalMsg = await stream.finalMessage()
-      generation.end({
-        output: fullResponse,
-        usage: {
-          input:  finalMsg.usage.input_tokens,
-          output: finalMsg.usage.output_tokens,
-        },
-      })
+      try {
+        const finalMsg = await stream.finalMessage()
+        generation.end({
+          output: fullResponse,
+          usage: {
+            input:  finalMsg.usage.input_tokens,
+            output: finalMsg.usage.output_tokens,
+          },
+        })
+        generationEnded = true
+      } catch { /* Langfuse usage capture failed — streaming was successful */ }
+
     } else {
       const client = new OpenAI({ apiKey })
       let inputTokens = 0
@@ -159,35 +165,43 @@ Skill level: ${validated.skillLevel}${
           yield* extractCompleteProjects(fullResponse, yieldedCount)
         }
         if (chunk.type === 'response.completed') {
-          inputTokens  = chunk.response.usage?.input_tokens  ?? 0
-          outputTokens = chunk.response.usage?.output_tokens ?? 0
+          inputTokens  = (chunk.response as { usage?: { input_tokens?: number } }).usage?.input_tokens  ?? 0
+          outputTokens = (chunk.response as { usage?: { output_tokens?: number } }).usage?.output_tokens ?? 0
         }
       }
 
-      generation.end({
-        output: fullResponse,
-        usage: { input: inputTokens, output: outputTokens },
-      })
+      try {
+        generation.end({
+          output: fullResponse,
+          usage: { input: inputTokens, output: outputTokens },
+        })
+        generationEnded = true
+      } catch { /* Langfuse usage capture failed — streaming was successful */ }
     }
 
     // Final validation of complete output
     const parsed = JSON.parse(fullResponse)
     Agent1OutputSchema.parse({ projects: parsed })
 
-    trace.update({
-      output: { projectCount: parsed.length },
-      metadata: {
-        model,
-        provider,
-        responseLength: fullResponse.length,
-        latencyMs: Date.now() - startTime,
-      },
-    })
+    try {
+      trace.update({
+        output: { projectCount: parsed.length },
+        metadata: {
+          model,
+          provider,
+          responseLength: fullResponse.length,
+          latencyMs: Date.now() - startTime,
+        },
+      })
+    } catch { /* non-critical */ }
+
   } catch (err) {
-    generation.end({ output: String(err), level: 'ERROR' })
-    trace.update({ metadata: { error: String(err) } })
+    if (!generationEnded) {
+      try { generation.end({ output: String(err) }) } catch { /* ignore */ }
+    }
+    try { trace.update({ metadata: { error: String(err) } }) } catch { /* ignore */ }
     throw err
   } finally {
-    await langfuse.flushAsync()
+    try { await langfuse.flushAsync() } catch { /* ignore */ }
   }
 }
