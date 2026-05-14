@@ -26,6 +26,9 @@ FOR EACH PROJECT, provide:
 - conceptsEncountered: the AI/RAG concepts the learner will actually use (e.g. "chunking strategy", "vector similarity search", "embedding models", "context window management"). 4–6 items.
 - skillsBuilt: practical engineering skills (e.g. "building streaming APIs", "Supabase pgvector setup", "Next.js Server Actions"). 3–5 items.
 
+RECOMMENDED FLAG:
+Exactly one project in the array must have "recommended": true — the one that best fits the learner's stated skill level and gives the clearest learning arc for a first project. All others must omit the field entirely (do not set it to false).
+
 WHAT NOT TO INCLUDE:
 - No prerequisites — conceptsEncountered is a map of what they'll meet, not a gate
 - No warmupResources — those live on milestones, not project cards
@@ -51,7 +54,8 @@ The array must be parseable by JSON.parse() with no preprocessing.
     "complexity": "beginner|intermediate|challenging",
     "estimatedHours": 12,
     "conceptsEncountered": ["...", "..."],
-    "skillsBuilt": ["...", "..."]
+    "skillsBuilt": ["...", "..."],
+    "recommended": true
   }
 ]`
 }

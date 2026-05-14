@@ -14,6 +14,7 @@ export function DashboardClient() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSelecting, setIsSelecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const hasResults = projects.length > 0 || isLoading
 
   const handleSubmit = useCallback(async (submittedTopic: string, skillLevel: string) => {
     setIsLoading(true)
@@ -75,8 +76,40 @@ export function DashboardClient() {
   }, [router, topic])
 
   return (
-    <div className="space-y-12">
-      <TopicEntry onSubmit={handleSubmit} isLoading={isLoading} />
+    <div className="space-y-10">
+      {/* Topic entry — collapses to a compact strip once results arrive */}
+      {!hasResults ? (
+        <div className="space-y-2">
+          <p
+            className="text-xs font-medium uppercase tracking-widest"
+            style={{ color: '#3d6b4f' }}
+          >
+            अभ्यासेन — learn by building
+          </p>
+          <TopicEntry onSubmit={handleSubmit} isLoading={isLoading} />
+        </div>
+      ) : (
+        <div
+          className="flex items-center justify-between py-3 px-4 rounded-xl"
+          style={{ backgroundColor: '#f0f7f3', border: '1px solid #b8d9c5' }}
+        >
+          <div className="flex items-center gap-2 text-sm" style={{ color: '#3d6b4f' }}>
+            <span className="font-semibold">{topic}</span>
+            {isLoading && (
+              <span style={{ color: '#6b6b6b' }}>· finding projects…</span>
+            )}
+          </div>
+          {!isLoading && (
+            <button
+              onClick={() => { setProjects([]); setError(null) }}
+              className="text-xs underline underline-offset-2"
+              style={{ color: '#3d6b4f' }}
+            >
+              Search again
+            </button>
+          )}
+        </div>
+      )}
 
       {error && (
         <div
@@ -89,24 +122,36 @@ export function DashboardClient() {
       )}
 
       {isLoading && projects.length === 0 && (
-        <div className="text-sm" style={{ color: '#6b6b6b' }}>
-          Finding projects for you...
+        <div className="flex items-center gap-2 text-sm" style={{ color: '#6b6b6b' }}>
+          <span
+            className="inline-block w-3 h-3 rounded-full animate-pulse"
+            style={{ backgroundColor: '#3d6b4f' }}
+          />
+          Looking for the right projects for you…
         </div>
       )}
 
       {projects.length > 0 && (
-        <section className="space-y-6">
-          <h2 className="font-serif text-xl font-semibold" style={{ color: '#1c1c1c' }}>
-            {isLoading
-              ? `Finding projects… (${projects.length} so far)`
-              : `${projects.length} project${projects.length === 1 ? '' : 's'} for you`
-            }
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {projects.map(project => (
+        <section className="space-y-5">
+          <div className="flex items-baseline gap-3">
+            <h2 className="font-serif text-xl font-semibold" style={{ color: '#1c1c1c' }}>
+              {isLoading
+                ? `${projects.length} so far…`
+                : `${projects.length} project${projects.length === 1 ? '' : 's'} for you`
+              }
+            </h2>
+            {!isLoading && (
+              <span className="text-sm" style={{ color: '#9b9b9b' }}>
+                Pick one and start building.
+              </span>
+            )}
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {projects.map((project, i) => (
               <ProjectIdeaCard
                 key={project.id}
                 project={project}
+                index={i}
                 onSelect={handleSelect}
                 isSelecting={isSelecting}
               />

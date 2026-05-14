@@ -42,6 +42,7 @@ export const ProjectIdeaSchema = z.object({
   estimatedHours:      z.number(),
   conceptsEncountered: z.array(z.string()),
   skillsBuilt:         z.array(z.string()),
+  recommended:         z.boolean().optional(),
   // warmupResources live on milestones, NOT on the project card
 })
 export type ProjectIdea = z.infer<typeof ProjectIdeaSchema>
