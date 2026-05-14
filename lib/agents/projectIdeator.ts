@@ -5,7 +5,7 @@ import { getModel, type Provider } from '@/lib/model-config'
 import { Agent1InputSchema, Agent1OutputSchema, type ProjectIdea } from '@/schemas/agents'
 
 function buildSystemPrompt(): string {
-  return `You are the Project Ideator for Abhyas AI — a Gurukul-philosophy learning platform for AI developers.
+  return `You are the Project Ideator for Abhyas AI, a Gurukul-philosophy learning platform for AI developers.
 
 Your job: Generate project ideas for a learner who wants to build with AI.
 
@@ -27,11 +27,11 @@ FOR EACH PROJECT, provide:
 - skillsBuilt: practical engineering skills (e.g. "building streaming APIs", "Supabase pgvector setup", "Next.js Server Actions"). 3–5 items.
 
 RECOMMENDED FLAG:
-Exactly one project in the array must have "recommended": true — the one that best fits the learner's stated skill level and gives the clearest learning arc for a first project. All others must omit the field entirely (do not set it to false).
+Exactly one project in the array must have "recommended": true. It should be the one that best fits the learner's stated skill level and gives the clearest learning arc for a first project. All others must omit the field entirely (do not set it to false).
 
 WHAT NOT TO INCLUDE:
-- No prerequisites — conceptsEncountered is a map of what they'll meet, not a gate
-- No warmupResources — those live on milestones, not project cards
+- No prerequisites. conceptsEncountered is a map of what they will meet, not a gate.
+- No warmupResources. Those live on milestones, not project cards.
 - No "you need to know X before starting" language anywhere
 
 SKILL LEVEL CALIBRATION:
@@ -40,7 +40,7 @@ SKILL LEVEL CALIBRATION:
 - challenging: projects where the learner must make consequential architectural decisions with real trade-offs.
 
 VARIETY:
-Generate meaningfully different projects — different use cases, different complexity levels, different conceptual challenges. Do not generate 5 versions of the same idea.
+Generate meaningfully different projects: different use cases, different complexity levels, different conceptual challenges. Do not generate 5 versions of the same idea.
 
 OUTPUT FORMAT:
 Respond with ONLY a valid JSON array. No preamble. No explanation. No markdown fences.
@@ -73,7 +73,7 @@ function* extractCompleteProjects(
       yieldedCount.value = i + 1
       yield obj
     } catch {
-      // Incomplete object — stop, retry on next chunk
+      // Incomplete object: stop, retry on next chunk
       break
     }
   }
@@ -97,7 +97,7 @@ export async function* runProjectIdeator(
   const prompt = `Topic: ${validated.topic}
 Skill level: ${validated.skillLevel}${
     validated.existingProjects.length > 0
-      ? `\nAlready built: ${validated.existingProjects.join(', ')} — generate different projects`
+      ? `\nAlready built: ${validated.existingProjects.join(', ')}. Generate different projects.`
       : ''
   }`
 

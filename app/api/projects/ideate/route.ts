@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     .single()
 
   if (!user?.encrypted_api_key) {
-    return new Response(JSON.stringify({ error: 'No API key found — complete onboarding first' }), { status: 400 })
+    return new Response(JSON.stringify({ error: 'No API key found. Complete onboarding first.' }), { status: 400 })
   }
 
   const { topic, skillLevel } = await request.json() as { topic: string; skillLevel: string }

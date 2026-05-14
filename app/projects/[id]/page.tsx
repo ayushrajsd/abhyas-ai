@@ -1,4 +1,4 @@
-// STUB — replaced in Phase 4 (Agent 2 + Milestone Roadmap)
+// STUB: replaced in Phase 4 (Agent 2 + Milestone Roadmap)
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
   return (

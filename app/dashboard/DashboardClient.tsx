@@ -53,7 +53,7 @@ export function DashboardClient() {
             const project = JSON.parse(line) as ProjectIdea
             setProjects(prev => [...prev, project])
           } catch {
-            // malformed line — skip
+            // malformed line: skip
           }
         }
       }
@@ -77,14 +77,14 @@ export function DashboardClient() {
 
   return (
     <div className="space-y-10">
-      {/* Topic entry — collapses to a compact strip once results arrive */}
+      {/* Topic entry: collapses to a compact strip once results arrive */}
       {!hasResults ? (
         <div className="space-y-2">
           <p
             className="text-xs font-medium uppercase tracking-widest"
             style={{ color: '#3d6b4f' }}
           >
-            अभ्यासेन — learn by building
+            अभ्यासेन · learn by building
           </p>
           <TopicEntry onSubmit={handleSubmit} isLoading={isLoading} />
         </div>

@@ -52,7 +52,7 @@ export default async function DashboardPage() {
             Good to have you back, <span className="font-medium" style={{ color: '#3d6b4f' }}>@{user.github_username}</span>
           </p>
 
-          {/* The insight — two lines that land before the explanation */}
+          {/* The insight: two lines that land before the explanation */}
           <h1 className="font-serif font-bold leading-tight" style={{ fontSize: '2rem', color: '#1c1c1c' }}>
             AI can ship it.
           </h1>
@@ -60,11 +60,11 @@ export default async function DashboardPage() {
             That&apos;s not the point.
           </h2>
 
-          {/* The explanation — Tapovan pacing: short, landed, no padding */}
+          {/* The explanation: Tapovan pacing, short, landed, no padding */}
           <div className="mt-6 space-y-3 max-w-xl">
             <p className="text-sm leading-relaxed" style={{ color: '#4b4b4b' }}>
               Cars move faster than legs. People still run.
-              AI builds faster than you can type. That is not a reason to stop — it is the reason to start.
+              AI builds faster than you can type. That is not a reason to stop. It is the reason to start.
             </p>
             <p className="text-sm leading-relaxed" style={{ color: '#6b6b6b' }}>
               Pick a project. Work through it yourself. Ask for the next step only when you need it.

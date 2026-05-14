@@ -57,7 +57,7 @@ export function ProjectIdeaCard({ project, index, onSelect, isSelecting }: Proje
       )}
 
       <div className="p-5 flex flex-col flex-1 space-y-4">
-        {/* Zone 1 — Identity */}
+        {/* Zone 1: Identity */}
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-3">
             <h2 className="font-serif text-base font-semibold leading-snug" style={{ color: '#1c1c1c' }}>
@@ -78,7 +78,7 @@ export function ProjectIdeaCard({ project, index, onSelect, isSelecting }: Proje
           </p>
         </div>
 
-        {/* Zone 2 — Concepts + Skills */}
+        {/* Zone 2: Concepts + Skills */}
         <div
           className="grid grid-cols-2 gap-4 pt-3"
           style={{ borderTop: '1px solid #f0ece6' }}
@@ -111,7 +111,7 @@ export function ProjectIdeaCard({ project, index, onSelect, isSelecting }: Proje
           </div>
         </div>
 
-        {/* Zone 3 — CTA */}
+        {/* Zone 3: CTA */}
         <div className="pt-1 mt-auto">
           <button
             onClick={() => onSelect(project)}

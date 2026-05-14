@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAuthClient()
 
-  // Exchange the code for a session — this is the required step with PKCE flow
+  // Exchange the code for a session: required step with PKCE flow
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
   console.log('[auth/callback] exchangeCodeForSession error:', error?.message ?? 'none')
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   const session = data.session
 
-  // CRITICAL: provider_token is only available here at exchange time — never again
+  // CRITICAL: provider_token is only available here at exchange time, never again
   const githubToken = session.provider_token
   console.log('[auth/callback] provider_token present:', !!githubToken)
   if (!githubToken) {
