@@ -12,7 +12,7 @@ export function DashboardClient() {
   const [topic, setTopic] = useState('')
   const [projects, setProjects] = useState<ProjectIdea[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isSelecting, setIsSelecting] = useState(false)
+  const [selectingId, setSelectingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const hasResults = projects.length > 0 || isLoading
 
@@ -65,13 +65,13 @@ export function DashboardClient() {
   }, [router])
 
   const handleSelect = useCallback(async (project: ProjectIdea) => {
-    setIsSelecting(true)
+    setSelectingId(project.id)
     try {
       const projectId = await selectProject(project, topic)
       router.push(`/projects/${projectId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start project')
-      setIsSelecting(false)
+      setSelectingId(null)
     }
   }, [router, topic])
 
@@ -153,7 +153,7 @@ export function DashboardClient() {
                 project={project}
                 index={i}
                 onSelect={handleSelect}
-                isSelecting={isSelecting}
+                isSelecting={selectingId === project.id}
               />
             ))}
           </div>
