@@ -82,8 +82,8 @@ export default async function LandingPage({
               That changes what you can ship. It does not change what you understand.
             </p>
             <p style={{ color: '#1c1c1c', fontWeight: 500 }}>
-              The developer who builds through confusion — who hits the error,
-              reads the docs, tries again — is learning something the other one is not.
+              The developer who builds through confusion, who hits the error,
+              reads the docs, and tries again, is learning something the other one is not.
             </p>
             <p>
               Abhyas creates that space.
