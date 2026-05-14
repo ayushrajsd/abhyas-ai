@@ -127,7 +127,7 @@ export function DashboardClient() {
             className="inline-block w-3 h-3 rounded-full animate-pulse"
             style={{ backgroundColor: '#3d6b4f' }}
           />
-          Looking for the right projects for you…
+          Finding projects worth building…
         </div>
       )}
 
@@ -142,7 +142,7 @@ export function DashboardClient() {
             </h2>
             {!isLoading && (
               <span className="text-sm" style={{ color: '#9b9b9b' }}>
-                Pick one and start building.
+                One will fit where you are right now.
               </span>
             )}
           </div>

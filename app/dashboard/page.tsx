@@ -41,22 +41,36 @@ export default async function DashboardPage() {
 
       {/* Hero */}
       <div
-        className="px-8 py-12"
+        className="px-8 py-14"
         style={{
           background: 'linear-gradient(180deg, #eef6f1 0%, #f7f4ef 100%)',
           borderBottom: '1px solid #e8e3da',
         }}
       >
-        <div className="max-w-4xl mx-auto space-y-1">
-          <p className="text-sm" style={{ color: '#3d6b4f' }}>
-            Welcome back, <span className="font-semibold">@{user.github_username}</span>
+        <div className="max-w-4xl mx-auto">
+          <p className="text-sm mb-5" style={{ color: '#6b6b6b' }}>
+            Good to have you back, <span className="font-medium" style={{ color: '#3d6b4f' }}>@{user.github_username}</span>
           </p>
-          <h1 className="font-serif text-3xl font-bold leading-tight" style={{ color: '#1c1c1c' }}>
-            What will you build today?
+
+          {/* The insight — two lines that land before the explanation */}
+          <h1 className="font-serif font-bold leading-tight" style={{ fontSize: '2rem', color: '#1c1c1c' }}>
+            AI can ship it.
           </h1>
-          <p className="text-sm pt-1" style={{ color: '#6b6b6b' }}>
-            Enter a topic, pick a project, build it on your machine. No hand-holding — just the next right step.
-          </p>
+          <h2 className="font-serif font-semibold leading-snug mt-1" style={{ fontSize: '1.4rem', color: '#4b4b4b' }}>
+            That&apos;s not the point.
+          </h2>
+
+          {/* The explanation — Tapovan pacing: short, landed, no padding */}
+          <div className="mt-6 space-y-3 max-w-xl">
+            <p className="text-sm leading-relaxed" style={{ color: '#4b4b4b' }}>
+              Cars move faster than legs. People still run.
+              AI builds faster than you can type. That is not a reason to stop — it is the reason to start.
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: '#6b6b6b' }}>
+              Pick a project. Work through it yourself. Ask for the next step only when you need it.
+              The understanding, when it arrives, stays.
+            </p>
+          </div>
         </div>
       </div>
 

@@ -30,7 +30,7 @@ export function TopicEntry({ onSubmit, isLoading }: TopicEntryProps) {
           What do you want to build?
         </label>
         <p className="text-sm" style={{ color: '#6b6b6b' }}>
-          Abhyas V1 is built for RAG projects on Next.js + Supabase.
+          Start with RAG. Build on your own machine. Push to GitHub when done.
         </p>
       </div>
 
@@ -86,7 +86,7 @@ export function TopicEntry({ onSubmit, isLoading }: TopicEntryProps) {
         className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-50"
         style={{ backgroundColor: '#3d6b4f', color: '#ffffff' }}
       >
-        {isLoading ? 'Finding projects...' : 'Show me projects'}
+        {isLoading ? 'Finding projects…' : 'Show me projects'}
       </button>
     </div>
   )
