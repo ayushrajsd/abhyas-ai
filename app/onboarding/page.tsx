@@ -37,14 +37,14 @@ export default async function OnboardingPage() {
       </nav>
 
       <main className="max-w-4xl mx-auto px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-        {/* Left — context */}
+        {/* Left: context */}
         <div className="space-y-6">
           <div className="space-y-3">
             <h1 className="font-serif text-3xl font-bold text-charcoal">
               One last thing before you start
             </h1>
             <p className="text-muted leading-relaxed">
-              Abhyas uses your own AI key — no shared quota, no data sent to us.
+              Abhyas uses your own AI key. No shared quota, no data sent to us.
               Your key is encrypted before storage and decrypted only during agent calls.
             </p>
           </div>
@@ -61,7 +61,7 @@ export default async function OnboardingPage() {
                 <li key={item.label} className="flex gap-3 text-sm">
                   <span className="text-forest mt-0.5">◆</span>
                   <span>
-                    <span className="font-medium text-charcoal">{item.label} — </span>
+                    <span className="font-medium text-charcoal">{item.label}: </span>
                     <span className="text-muted">{item.desc}</span>
                   </span>
                 </li>
@@ -70,7 +70,7 @@ export default async function OnboardingPage() {
           </div>
         </div>
 
-        {/* Right — form */}
+        {/* Right: form */}
         <div className="bg-white border border-border rounded-2xl p-7 shadow-sm">
           <ApiKeyForm />
         </div>

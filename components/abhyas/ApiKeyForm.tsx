@@ -73,7 +73,7 @@ export default function ApiKeyForm() {
         </div>
       </div>
 
-      {/* Key input — only shown after provider selected */}
+      {/* Key input: only shown after provider selected */}
       {provider && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -103,12 +103,12 @@ export default function ApiKeyForm() {
           />
           {mismatch && (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
-              This key looks like an {detectedProvider === 'anthropic' ? 'Anthropic' : 'OpenAI'} key — switching provider.
+              This key looks like an {detectedProvider === 'anthropic' ? 'Anthropic' : 'OpenAI'} key. Switching provider.
             </p>
           )}
           {key.length > 5 && !detectedProvider && (
             <p className="text-xs text-amber-700">
-              Key format not recognised — expected {activeProvider?.prefix}
+              Key format not recognised. Expected {activeProvider?.prefix}
             </p>
           )}
           <p className="text-xs text-muted">

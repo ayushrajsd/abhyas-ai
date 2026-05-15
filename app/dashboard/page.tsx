@@ -1,5 +1,6 @@
 import { createAuthClient } from '@/lib/supabase'
 import { redirect } from 'next/navigation'
+import { DashboardClient } from './DashboardClient'
 
 export default async function DashboardPage() {
   const supabase = createAuthClient()
@@ -17,28 +18,28 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f7f4ef', color: '#1c1c1c' }}>
-      {/* Nav */}
-      <nav style={{ borderBottom: '1px solid #ddd8cf' }} className="flex items-center justify-between px-8 py-5">
-        <span className="font-serif text-lg font-semibold">
+      <div style={{ height: 3, background: 'linear-gradient(90deg, #3d6b4f 0%, #7ab394 60%, #f7f4ef 100%)' }} />
+
+      <nav className="flex items-center justify-between px-8 py-5" style={{ borderBottom: '1px solid #e8e3da' }}>
+        <span className="font-serif text-lg font-semibold tracking-tight">
           Abhyas<span style={{ color: '#3d6b4f' }}>.ai</span>
         </span>
         {user.github_avatar && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={user.github_avatar} alt={user.github_username ?? ''} className="w-7 h-7 rounded-full" />
+            <img
+              src={user.github_avatar}
+              alt={user.github_username ?? ''}
+              className="w-7 h-7 rounded-full"
+              style={{ border: '1.5px solid #ddd8cf' }}
+            />
             <span className="text-sm" style={{ color: '#6b6b6b' }}>@{user.github_username}</span>
           </div>
         )}
       </nav>
 
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-8 py-24 text-center space-y-6">
-        <h1 className="font-serif text-4xl font-bold">
-          Welcome back, {user.github_username}.
-        </h1>
-        <p style={{ color: '#6b6b6b' }}>
-          Your projects will appear here. Topic entry is coming in the next phase.
-        </p>
+      <main className="max-w-4xl mx-auto px-8 py-16">
+        <DashboardClient username={user.github_username ?? ''} />
       </main>
     </div>
   )

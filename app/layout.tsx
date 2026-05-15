@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Abhyas AI — Learn by building",
+  title: "Abhyas AI: Learn by building",
   description: "AI-guided project learning. You build. The AI asks better questions.",
 };
 

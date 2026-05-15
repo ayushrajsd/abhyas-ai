@@ -140,7 +140,12 @@ The agent wraps whichever stream into a `ReadableStream` before returning to the
 - **Input:** topic (string), skillLevel, existingProjects[]
 - **Output:** `projects: ProjectIdea[]` (5–7 items), Zod-validated, streamed card-by-card
 - **Key rules:** No prerequisites shown on the card. `conceptsEncountered[]` is a map, not a gate. `warmupResources[]` does NOT live on the project card — it lives on milestones. The card shows only what the learner will encounter and build.
-- **Card zones:** (1) Title + description + complexity badge + estimated hours. (2) Concepts encountered + Skills built — two columns, no prerequisites. (3) "Start Project" button only.
+- **Card zones:** (1) Title + description + complexity badge + estimated hours + bookmark button. (2) Concepts encountered + Skills built — two columns, no prerequisites. (3) "Start Project" button only.
+- **Complexity distribution — enforce exactly in the system prompt:**
+  - beginner: 5 beginner, 1 intermediate, 0 challenging
+  - intermediate: 1 beginner, 4 intermediate, 2 challenging
+  - advanced: 0 beginner, 2 intermediate, 5 challenging
+- **Save for Later:** Learners can bookmark any card. Bookmarked projects are stored in the `projects` table with `status = 'saved'`. They persist across sessions and appear in a compact list above the topic entry on the dashboard. Bookmark state is detected by title matching (AI-generated IDs are not stable across sessions).
 
 ### Agent 2 — Milestone Architect (blue)
 - **Model tier:** `capable` → `claude-sonnet-4-5` (Anthropic) / `gpt-5.4-mini` (OpenAI). Do not downgrade — milestone quality shapes the entire learner journey.
