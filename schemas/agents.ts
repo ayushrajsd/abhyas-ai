@@ -4,16 +4,11 @@ import {
   SetupItemSchema,
   PrewrittenHintsSchema,
   VerificationStatusSchema,
+  WarmupResourceSchema,
 } from './db'
 
-// ─── Shared agent types ───────────────────────────────────────────────────────
-
-export const WarmupResourceSchema = z.object({
-  title:   z.string(),
-  url:     z.string().url(),
-  concept: z.string(),
-  type:    z.enum(['docs', 'video', 'article', 'interactive']),
-})
+// WarmupResource is defined in db.ts to avoid circular imports
+export { WarmupResourceSchema }
 export type WarmupResource = z.infer<typeof WarmupResourceSchema>
 
 export const LearnerStatsInputSchema = z.object({

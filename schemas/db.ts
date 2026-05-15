@@ -5,7 +5,7 @@ import { z } from 'zod'
 export const ProviderSchema = z.enum(['anthropic', 'openai'])
 export const SkillLevelSchema = z.enum(['beginner', 'intermediate', 'advanced'])
 export const ComplexitySchema = z.enum(['beginner', 'intermediate', 'challenging'])
-export const ProjectStatusSchema = z.enum(['active', 'complete', 'paused'])
+export const ProjectStatusSchema = z.enum(['active', 'complete', 'paused', 'saved'])
 export const MilestoneStatusSchema = z.enum(['locked', 'active', 'complete'])
 export const VerificationTypeSchema = z.enum(['verified', 'self'])
 export const TaskStatusSchema = z.enum(['locked', 'active', 'done'])
@@ -20,6 +20,17 @@ export const SetupItemSchema = z.object({
   done:    z.boolean().default(false),
 })
 export type SetupItem = z.infer<typeof SetupItemSchema>
+
+// ─── Warmup resource ──────────────────────────────────────────────────────────
+// Defined here to avoid a circular import with schemas/agents.ts
+
+export const WarmupResourceSchema = z.object({
+  title:   z.string(),
+  url:     z.string().url(),
+  concept: z.string(),
+  type:    z.enum(['docs', 'video', 'article', 'interactive']),
+})
+export type WarmupResource = z.infer<typeof WarmupResourceSchema>
 
 // ─── DB Row types ─────────────────────────────────────────────────────────────
 
@@ -38,15 +49,16 @@ export const UserRowSchema = z.object({
 export type UserRow = z.infer<typeof UserRowSchema>
 
 export const ProjectRowSchema = z.object({
-  id:          z.string().uuid(),
-  user_id:     z.string().uuid(),
-  topic:       z.string(),
-  title:       z.string(),
-  description: z.string(),
-  complexity:  ComplexitySchema,
-  status:      ProjectStatusSchema,
-  github_repo: z.string().nullable(),
-  created_at:  z.string(),
+  id:           z.string().uuid(),
+  user_id:      z.string().uuid(),
+  topic:        z.string(),
+  title:        z.string(),
+  description:  z.string(),
+  complexity:   ComplexitySchema,
+  status:       ProjectStatusSchema,
+  github_repo:  z.string().nullable(),
+  project_data: z.unknown().nullable(),  // full ProjectIdea JSON — validated by agents.ts
+  created_at:   z.string(),
 })
 export type ProjectRow = z.infer<typeof ProjectRowSchema>
 
@@ -57,6 +69,7 @@ export const MilestoneRowSchema = z.object({
   description:         z.string(),
   learning_objectives: z.array(z.string()),
   concepts_introduced: z.array(z.string()),
+  warmup_resources:    z.array(WarmupResourceSchema).default([]),
   order_index:         z.number().int(),
   status:              MilestoneStatusSchema,
   verification_type:   VerificationTypeSchema.nullable(),
