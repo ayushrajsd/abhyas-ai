@@ -34,10 +34,17 @@ WHAT NOT TO INCLUDE:
 - No warmupResources. Those live on milestones, not project cards.
 - No "you need to know X before starting" language anywhere
 
+COMPLEXITY DISTRIBUTION — follow exactly:
+- beginner skill level:     5 beginner projects, 1 intermediate, 0 challenging
+- intermediate skill level: 1 beginner, 4 intermediate, 2 challenging
+- advanced skill level:     0 beginner, 2 intermediate, 5 challenging
+
+Do not deviate from these counts. The learner chose a skill level and expects to see projects at that level.
+
 SKILL LEVEL CALIBRATION:
-- beginner: favour projects with clear, bounded scope. Avoid open-ended architecture decisions.
-- intermediate: projects that require real design choices. Some ambiguity is intentional.
-- challenging: projects where the learner must make consequential architectural decisions with real trade-offs.
+- beginner: clear, bounded scope. No open-ended architecture decisions.
+- intermediate: requires real design choices. Some ambiguity is intentional.
+- challenging: consequential architectural decisions with real trade-offs.
 
 VARIETY:
 Generate meaningfully different projects: different use cases, different complexity levels, different conceptual challenges. Do not generate 5 versions of the same idea.

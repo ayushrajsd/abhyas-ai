@@ -1,10 +1,18 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { TopicEntry } from '@/components/abhyas/TopicEntry'
 import { ProjectIdeaCard } from '@/components/abhyas/ProjectIdeaCard'
-import { selectProject } from '@/actions/agents'
+import { SavedIdeasSection } from '@/components/abhyas/SavedIdeasSection'
+import {
+  selectProject,
+  getSavedProjects,
+  bookmarkProject,
+  removeBookmark,
+  startSavedProject,
+} from '@/actions/agents'
+import type { SavedIdea } from '@/actions/agents'
 import type { ProjectIdea } from '@/schemas/agents'
 
 export function DashboardClient({ username }: { username: string }) {
@@ -14,7 +22,17 @@ export function DashboardClient({ username }: { username: string }) {
   const [isLoading, setIsLoading] = useState(false)
   const [selectingId, setSelectingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>([])
+  const [startingId, setStartingId] = useState<string | null>(null)
+
   const hasResults = projects.length > 0 || isLoading
+
+  useEffect(() => {
+    getSavedProjects().then(setSavedIdeas).catch(() => {})
+  }, [])
+
+  const savedTitles = new Set(savedIdeas.map(s => s.title))
 
   const handleSubmit = useCallback(async (submittedTopic: string, skillLevel: string) => {
     setIsLoading(true)
@@ -75,8 +93,67 @@ export function DashboardClient({ username }: { username: string }) {
     }
   }, [router, topic])
 
+  const handleBookmark = useCallback(async (project: ProjectIdea) => {
+    const alreadySaved = savedTitles.has(project.title)
+
+    if (alreadySaved) {
+      const existing = savedIdeas.find(s => s.title === project.title)
+      if (!existing) return
+      setSavedIdeas(prev => prev.filter(s => s.id !== existing.id))
+      try {
+        await removeBookmark(existing.id)
+      } catch {
+        setSavedIdeas(prev => [...prev, existing])
+      }
+    } else {
+      const tempId = `temp-${Date.now()}`
+      const optimistic: SavedIdea = {
+        id: tempId,
+        title: project.title,
+        description: project.description,
+        complexity: project.complexity,
+        topic,
+      }
+      setSavedIdeas(prev => [optimistic, ...prev])
+      try {
+        const realId = await bookmarkProject(project, topic)
+        setSavedIdeas(prev => prev.map(s => s.id === tempId ? { ...s, id: realId } : s))
+      } catch {
+        setSavedIdeas(prev => prev.filter(s => s.id !== tempId))
+        setError('Could not save idea. Try again.')
+      }
+    }
+  }, [savedIdeas, savedTitles, topic])
+
+  const handleRemoveSaved = useCallback(async (idea: SavedIdea) => {
+    setSavedIdeas(prev => prev.filter(s => s.id !== idea.id))
+    try {
+      await removeBookmark(idea.id)
+    } catch {
+      setSavedIdeas(prev => [idea, ...prev])
+    }
+  }, [])
+
+  const handleStartSaved = useCallback(async (idea: SavedIdea) => {
+    setStartingId(idea.id)
+    try {
+      await startSavedProject(idea.id)
+      router.push(`/projects/${idea.id}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start project')
+      setStartingId(null)
+    }
+  }, [router])
+
   return (
     <div className="space-y-10">
+      <SavedIdeasSection
+        ideas={savedIdeas}
+        startingId={startingId}
+        onStart={handleStartSaved}
+        onRemove={handleRemoveSaved}
+      />
+
       {/* Topic entry: collapses to a compact strip once results arrive */}
       {!hasResults ? (
         <div className="space-y-5">
@@ -155,6 +232,8 @@ export function DashboardClient({ username }: { username: string }) {
                 key={project.id}
                 project={project}
                 index={i}
+                isBookmarked={savedTitles.has(project.title)}
+                onBookmark={handleBookmark}
                 onSelect={handleSelect}
                 isSelecting={selectingId === project.id}
               />

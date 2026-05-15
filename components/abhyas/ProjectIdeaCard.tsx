@@ -5,6 +5,8 @@ import type { ProjectIdea } from '@/schemas/agents'
 interface ProjectIdeaCardProps {
   project: ProjectIdea
   index: number
+  isBookmarked: boolean
+  onBookmark: (project: ProjectIdea) => void
   onSelect: (project: ProjectIdea) => void
   isSelecting: boolean
 }
@@ -18,7 +20,17 @@ const COMPLEXITY_STYLES: Record<
   challenging:  { bg: '#fef2f2', text: '#991b1b', border: '#fecaca' },
 }
 
-export function ProjectIdeaCard({ project, index, onSelect, isSelecting }: ProjectIdeaCardProps) {
+function BookmarkIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
+export function ProjectIdeaCard({
+  project, index, isBookmarked, onBookmark, onSelect, isSelecting,
+}: ProjectIdeaCardProps) {
   const badge = COMPLEXITY_STYLES[project.complexity]
   const delay = `${index * 80}ms`
 
@@ -59,16 +71,26 @@ export function ProjectIdeaCard({ project, index, onSelect, isSelecting }: Proje
       <div className="p-5 flex flex-col flex-1 space-y-4">
         {/* Zone 1: Identity */}
         <div className="space-y-2">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-2">
             <h2 className="font-serif text-base font-semibold leading-snug" style={{ color: '#1c1c1c' }}>
               {project.title}
             </h2>
-            <span
-              className="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full border capitalize"
-              style={{ backgroundColor: badge.bg, color: badge.text, borderColor: badge.border }}
-            >
-              {project.complexity}
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span
+                className="text-xs font-medium px-2.5 py-1 rounded-full border capitalize"
+                style={{ backgroundColor: badge.bg, color: badge.text, borderColor: badge.border }}
+              >
+                {project.complexity}
+              </span>
+              <button
+                onClick={() => onBookmark(project)}
+                title={isBookmarked ? 'Remove from saved' : 'Save for later'}
+                className="p-1 rounded transition-colors"
+                style={{ color: isBookmarked ? '#3d6b4f' : '#c5bfb5' }}
+              >
+                <BookmarkIcon filled={isBookmarked} />
+              </button>
+            </div>
           </div>
           <p className="text-sm leading-relaxed" style={{ color: '#4b4b4b' }}>
             {project.description}
@@ -120,7 +142,7 @@ export function ProjectIdeaCard({ project, index, onSelect, isSelecting }: Proje
             style={{
               backgroundColor: project.recommended ? '#3d6b4f' : 'transparent',
               color: project.recommended ? '#ffffff' : '#3d6b4f',
-              border: `1.5px solid #3d6b4f`,
+              border: '1.5px solid #3d6b4f',
             }}
           >
             {isSelecting ? 'Starting…' : 'Start Project'}
