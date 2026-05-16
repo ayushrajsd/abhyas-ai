@@ -54,6 +54,13 @@ export async function generateAndSaveMilestones(projectId: string): Promise<void
   if (projectResult.error || !projectResult.data) throw new Error('Project not found')
   if (userResult.error || !userResult.data) throw new Error('User not found')
 
+  // Guard: if milestones already exist, do nothing (prevents double-generation from Strict Mode)
+  const { count } = await db
+    .from('milestones')
+    .select('id', { count: 'exact', head: true })
+    .eq('project_id', projectId)
+  if ((count ?? 0) > 0) return
+
   const projectRow = projectResult.data
   const user = userResult.data
 
