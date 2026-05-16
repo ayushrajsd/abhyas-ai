@@ -5,31 +5,31 @@ import { useState } from 'react'
 const STEPS = [
   {
     label: 'Warm up first',
-    detail: 'Expand the warm-up shelf on your active milestone and read the linked resources before writing any code. They cover exactly the concepts you will encounter.',
+    detail: 'Expand the warm-up shelf and read the linked resources before writing any code. They cover exactly the concepts you will encounter in this milestone.',
   },
   {
     label: 'Begin the milestone',
-    detail: 'Click "Begin Milestone" to see the task breakdown. Each milestone has 3–5 tasks, strictly ordered — you cannot start the next until the current one is done.',
+    detail: 'Click "Begin Milestone" to see the task breakdown. Each milestone has 3 to 5 tasks. You cannot start the next task until the current one is done.',
   },
   {
     label: 'When you get stuck',
-    detail: 'Each task has 3 pre-written hints (L1 → L2 → L3). Try those first. If you are still stuck, the Nudge AI gives you a directional push — it will never write the code for you.',
+    detail: 'Each task has 3 pre-written hints. Try those first. If still stuck, the Nudge AI gives you a directional push. It will never write the code for you.',
   },
   {
     label: 'Mark tasks done',
-    detail: 'A task is done when you meet its "done when" criterion — something concrete and checkable. Completing all tasks in a milestone unlocks the next one.',
+    detail: 'A task is done when you meet its "done when" criterion. Something concrete and checkable. Completing all tasks unlocks the next milestone.',
   },
 ]
 
 function HelpContent() {
   return (
     <div className="space-y-5">
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#6b6b6b' }}>
-          How this roadmap was built
+          How your roadmap was designed
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: '#4b4b4b' }}>
-          The AI analyzed your project — its scope, complexity, and the concepts you will encounter — and broke it into milestones that build on each other. Each milestone ends with something testable so you always know when you are done.
+        <p className="text-xs leading-relaxed" style={{ color: '#4b4b4b', lineHeight: '1.65' }}>
+          The AI analyzed your project, its scope, complexity, and the concepts you will encounter. It designed milestones that build on each other. Each one ends with something testable so you always know when you are done.
         </p>
       </div>
 
@@ -37,27 +37,27 @@ function HelpContent() {
 
       <div className="space-y-1.5">
         <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#6b6b6b' }}>
-          What to do
+          How to work through it
         </p>
-        <div className="space-y-4">
+        <div className="space-y-4 pt-1">
           {STEPS.map((step, i) => (
             <div key={i} className="flex gap-3">
               <div className="flex flex-col items-center shrink-0">
                 <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                   style={{ backgroundColor: '#f0f7f3', color: '#3d6b4f', border: '1.5px solid #b8d9c5' }}
                 >
                   {i + 1}
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className="w-px mt-1" style={{ backgroundColor: '#e8e3da', height: '100%', minHeight: '16px' }} />
+                  <div className="w-px mt-1.5" style={{ backgroundColor: '#e8e3da', height: '100%', minHeight: '20px' }} />
                 )}
               </div>
               <div className="pb-1 min-w-0">
-                <p className="text-xs font-semibold mb-0.5" style={{ color: '#1c1c1c' }}>
+                <p className="text-xs font-semibold mb-1" style={{ color: '#1c1c1c' }}>
                   {step.label}
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: '#6b6b6b' }}>
+                <p className="text-xs leading-relaxed" style={{ color: '#6b6b6b', lineHeight: '1.6' }}>
                   {step.detail}
                 </p>
               </div>
@@ -68,14 +68,13 @@ function HelpContent() {
 
       <div style={{ borderTop: '1px solid #e8e3da' }} />
 
-      <p className="text-xs leading-relaxed italic" style={{ color: '#9b9b9b' }}>
+      <p className="text-xs leading-relaxed italic" style={{ color: '#9b9b9b', lineHeight: '1.6' }}>
         The teacher illuminates the path, not walks it for you. You build it. That is why it stays.
       </p>
     </div>
   )
 }
 
-// Renders only on mobile (lg:hidden) — collapsible banner inline with the main column
 export function MobileHelpBanner() {
   const [open, setOpen] = useState(false)
 
@@ -110,15 +109,14 @@ export function MobileHelpBanner() {
   )
 }
 
-// Renders only on desktop (hidden lg:block) — sticky sidebar
 export function DesktopHelpSidebar() {
   return (
     <aside className="hidden lg:block w-64 shrink-0">
       <div
-        className="sticky top-8 p-5 rounded-2xl space-y-4"
-        style={{ backgroundColor: '#ffffff', border: '1px solid #e8e3da' }}
+        className="sticky top-8 p-5 rounded-2xl"
+        style={{ backgroundColor: '#ffffff', border: '1px solid #e8e3da', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
       >
-        <p className="font-serif text-sm font-semibold" style={{ color: '#1c1c1c' }}>
+        <p className="font-serif text-sm font-semibold mb-4" style={{ color: '#1c1c1c' }}>
           How to use this
         </p>
         <HelpContent />
