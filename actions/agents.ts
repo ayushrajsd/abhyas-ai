@@ -60,7 +60,12 @@ export async function generateAndSaveMilestones(projectId: string): Promise<void
   if (!user.encrypted_api_key || !user.api_provider) {
     throw new Error('API key not configured. Please complete onboarding.')
   }
-  if (!user.skill_level) throw new Error('Skill level not set.')
+  // skill_level is set at ideation time; fall back to complexity-based inference for older sessions
+  const skillLevel = user.skill_level ?? (
+    projectRow.complexity === 'challenging' ? 'advanced' :
+    projectRow.complexity === 'intermediate' ? 'intermediate' :
+    'beginner'
+  )
 
   const apiKey = decryptApiKey(user.encrypted_api_key)
   const provider = user.api_provider as Provider
@@ -79,7 +84,7 @@ export async function generateAndSaveMilestones(projectId: string): Promise<void
   const milestones = await runMilestoneArchitect(
     {
       project,
-      skillLevel: user.skill_level,
+      skillLevel,
       topic: projectRow.topic,
     },
     provider,
