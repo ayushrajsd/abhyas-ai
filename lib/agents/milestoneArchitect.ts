@@ -151,7 +151,12 @@ Design a milestone roadmap for this project.`
       } catch { /* non-critical */ }
     }
 
-    const parsed = JSON.parse(fullResponse)
+    // Strip markdown fences if the model added them despite the instruction
+    const stripped = fullResponse
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/i, '')
+      .trim()
+    const parsed = JSON.parse(stripped)
     const validated_output = Agent2OutputSchema.parse(parsed)
 
     try {
