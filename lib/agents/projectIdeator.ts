@@ -20,7 +20,7 @@ Generate 5–7 distinct project ideas. Each must be genuinely buildable in the s
 
 FOR EACH PROJECT, provide:
 - title: specific and descriptive (e.g. "Codebase Q&A Assistant" not "RAG App")
-- description: 2–3 sentences. What it does, why it's interesting, what makes it non-trivial.
+- description: 2–3 sentences. What it does, why it's worth building, and what interesting challenge the learner will work through. Write with energy — this is the first thing a learner reads. Use forward-looking, curious language ("you will tackle", "the interesting challenge is", "you will figure out how to"). Never use discouraging or warning language ("the hard part", "this is tricky", "be careful", "you need to know"). The learner should finish reading and feel excited to start.
 - complexity: match to the learner's skill level. beginner → mostly beginner projects, a couple intermediate. intermediate → mix of intermediate and challenging.
 - estimatedHours: realistic total hours. beginner 8–20hrs, intermediate 15–35hrs, challenging 25–60hrs.
 - conceptsEncountered: the AI/RAG concepts the learner will actually use (e.g. "chunking strategy", "vector similarity search", "embedding models", "context window management"). 4–6 items.
