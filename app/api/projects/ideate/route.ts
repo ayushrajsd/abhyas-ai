@@ -24,6 +24,9 @@ export async function POST(request: Request) {
 
   const { topic, skillLevel } = await request.json() as { topic: string; skillLevel: string }
 
+  // Persist skill level so Agent 2 can read it when milestones are generated
+  await db.from('users').update({ skill_level: skillLevel }).eq('id', session.user.id)
+
   const apiKey = decryptApiKey(user.encrypted_api_key)
   const provider = user.api_provider as Provider
   const encoder = new TextEncoder()

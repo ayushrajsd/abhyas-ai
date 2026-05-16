@@ -11,6 +11,8 @@ Abhyas AI is a multi-agent AI learning platform built as a route inside tapovan.
 
 **The product in one sentence:** A learner enters a topic and skill level, gets AI-generated project ideas, picks one, works through milestones and tasks on their own machine, asks for nudges when stuck, gets verified via GitHub, and ends with a LinkedIn post draft that reflects their authentic journey.
 
+**Core value proposition:** Abhyas is the answer to "I want to learn Next.js / pgvector / RAG — but tutorials don't stick." You learn by building something real. The platform scaffolds the journey so an absolute beginner can enter with zero prior knowledge of the stack and exit with a working project and genuine understanding. The AI never carries you — it orients you, points you to the right resources at the right moment, and nudges you when you are genuinely stuck. The work — and the learning — stays yours.
+
 **What it is NOT:** Not a course platform. Not a tutorial generator. Not an AI that writes code for the learner. Ever.
 
 ---
@@ -159,8 +161,10 @@ The agent wraps whichever stream into a `ReadableStream` before returning to the
 - **Model tier:** `fast` for task list, `capable` for hints[] — both in the same call. Tasks are straightforward decomposition; hints require understanding where learners actually get stuck.
 - **Trigger:** `SELECT_PROJECT` (first milestone) and `COMPLETE_TASK` (when a milestone is complete, generates next milestone's tasks)
 - **Input:** milestone (Milestone), project (ProjectIdea), completedMilestones[], skillLevel
-- **Output:** `tasks: Task[]` (3–5 items), Zod-validated. Each task: title, description, concept, doneWhen (concrete and testable), hints[] (3 pre-written), estimatedMinutes
+- **Output:** `tasks: Task[]` (3–5 items), Zod-validated. Each task: title, description, concept, doneWhen (concrete and testable), hints[] (3 pre-written), estimatedMinutes, conceptResources[] (1–2 items, see below)
 - **Key rules:** Tasks are strictly ordered — cannot start N+1 before N is done. `doneWhen` is a concrete criterion, never a feeling. Hints are pre-generated at task creation — not at nudge time. Hint 1 = conceptual, Hint 2 = directional, Hint 3 = concrete (same 3-level philosophy as the Nudge Agent, but static).
+- **Task-level resource shelf — `conceptResources[]`:** Each task carries 1–2 learning resources specifically for its `concept` field (e.g. if the concept is "Next.js App Router file-based routing", the resources link to the relevant Next.js docs section and a short explainer). This is the task-level equivalent of the milestone warm-up shelf. It addresses the absolute beginner gap: the warm-up shelf covers concepts being *introduced* in the milestone, but learners may lack foundational stack knowledge (Next.js routing, React state, how Supabase clients work) that the milestone assumes. `conceptResources[]` fills that gap at the exact moment of need — right at the task where the concept appears. Shown as a collapsible "Learn this concept" shelf on the task view. Pre-computed at task generation time (no runtime API call). **This is the mechanism that makes Abhyas viable for absolute beginners, not just AI-adjacent developers.** A learner with zero Next.js knowledge can enter, and at every task where a new framework concept appears, the right resource is already waiting.
+- **Value proposition implication:** The combination of milestone warm-up shelf (new AI/RAG concepts) + task-level concept resources (stack fundamentals) means a learner can go from "I want to learn RAG but don't know where to start" to a working, verifiable project — without needing to pre-study a curriculum. The platform surfaces the right resource at the right moment, contextualised to the exact task. This is what differentiates Abhyas from both tutorial platforms (passive) and raw AI assistants (too permissive).
 
 ### Agent 4 — Nudge Agent (purple) ⚠️ Most Critical
 - **Model tier:** `capable` always → `claude-sonnet-4-5` (Anthropic) / `gpt-5.4-mini` (OpenAI). Never downgrade. Highest-stakes interaction in the platform.
@@ -224,7 +228,7 @@ type UserAction =
 `id` (uuid PK) · `project_id` (uuid FK) · `title` (text) · `description` (text) · `learning_objectives` (text[]) · `concepts_introduced` (text[]) · `order_index` (integer) · `status` (text: locked|active|complete) · `verification_type` (text: verified|self|null) · `verified_at` (timestamptz, nullable)
 
 ### tasks
-`id` (uuid PK) · `milestone_id` (uuid FK) · `title` (text) · `description` (text) · `concept` (text) · `done_when` (text) · `prewritten_hints` (jsonb: {l1, l2, l3}) · `order_index` (integer) · `status` (text: locked|active|done) · `estimated_minutes` (integer)
+`id` (uuid PK) · `milestone_id` (uuid FK) · `title` (text) · `description` (text) · `concept` (text) · `done_when` (text) · `prewritten_hints` (jsonb: {l1, l2, l3}) · `concept_resources` (jsonb: WarmupResource[], 1–2 items — task-level resource shelf for the task's primary concept) · `order_index` (integer) · `status` (text: locked|active|done) · `estimated_minutes` (integer)
 
 ### nudge_sessions
 `id` (uuid PK) · `task_id` (uuid FK) · `user_id` (uuid FK) · `stuck_description` (text) · `code_snippet` (text, nullable) · `nudge_level` (integer: 1|2|3) · `response` (text) · `was_helpful` (boolean, nullable, user-rated) · `created_at` (timestamptz)
@@ -353,7 +357,7 @@ Do not build any of the following before public launch:
 | Phase 2 | Schemas: All Zod schemas in `schemas/agents.ts` and `schemas/db.ts` | Every schema imports without error. Types are exported. No agent code yet. |
 | Phase 3 | Agent 1 + streaming UI | Enter "RAG" at beginner level, see 5–7 streaming project cards each with full content, click a warm-up resource pill and confirm it opens correctly, pick a project and see it saved in Supabase |
 | Phase 4 | Agent 2 + milestone roadmap UI | Pick a project, see milestone roadmap rendered, milestones in DB, Milestone 1 shows as "active" |
-| Phase 5 | Agent 3 + task flow + orchestrator COMPLETE_TASK branch | End-to-end flow works for one complete milestone — see all tasks, complete them in sequence, move to next milestone automatically |
+| Phase 5 | Agent 3 + task flow + orchestrator COMPLETE_TASK branch | End-to-end flow works for one complete milestone — see all tasks, complete them in sequence, move to next milestone automatically. Each task shows a "Learn this concept" shelf with 1–2 pre-generated resources for its concept field. |
 | Phase 6 | Agent 4 (Nudge) — the hardest phase | Mark a task stuck, see pre-written Hint 1, request more, see Nudge Agent's L1 streamed, escalate to L2 and L3, verify no complete code block appears in any response |
 | Phase 7 | Agent 5 + incremental GitHub OAuth | Select a repo, push code for Milestone 1, click Verify, see specific feedback with files reviewed listed |
 | Phase 8 | Agent 6 + polish | Three LinkedIn post variants render after project completion, all nudge/error/loading/empty states handled, 10 alpha users complete one milestone without unhandled error |
