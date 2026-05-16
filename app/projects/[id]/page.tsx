@@ -3,6 +3,7 @@ import { createAuthClient } from '@/lib/supabase'
 import { getProjectWithMilestones } from '@/actions/agents'
 import { MilestoneRoadmap } from '@/components/abhyas/MilestoneRoadmap'
 import { MilestoneGenerator } from '@/components/abhyas/MilestoneGenerator'
+import { MobileHelpBanner, DesktopHelpSidebar } from '@/components/abhyas/ProjectHelpSidebar'
 
 const COMPLEXITY_STYLES = {
   beginner:     { bg: '#f0f7f3', text: '#3d6b4f', border: '#b8d9c5' },
@@ -27,12 +28,12 @@ export default async function ProjectPage({ params }: { params: { id: string } }
       className="min-h-screen"
       style={{ backgroundColor: '#f7f4ef', color: '#1c1c1c' }}
     >
-      <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
+      <div className="max-w-5xl mx-auto px-4 py-10">
 
         {/* Back link */}
         <a
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+          className="inline-flex items-center gap-1.5 text-sm mb-8 transition-opacity hover:opacity-70"
           style={{ color: '#6b6b6b' }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -41,48 +42,63 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           Dashboard
         </a>
 
-        {/* Project header */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className="text-xs font-medium px-2.5 py-1 rounded-full border capitalize"
-              style={{ backgroundColor: badge?.bg, color: badge?.text, borderColor: badge?.border }}
-            >
-              {project.complexity}
-            </span>
-            <span className="text-xs" style={{ color: '#9b9b9b' }}>
-              {project.topic}
-            </span>
+        {/* Two-column layout: main content (left) + help sidebar (right, desktop only) */}
+        <div className="flex gap-10 items-start">
+
+          {/* Main column */}
+          <div className="flex-1 min-w-0 space-y-8">
+
+            {/* Help banner — visible on mobile only, collapses inline */}
+            <MobileHelpBanner />
+
+            {/* Project header */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className="text-xs font-medium px-2.5 py-1 rounded-full border capitalize"
+                  style={{ backgroundColor: badge?.bg, color: badge?.text, borderColor: badge?.border }}
+                >
+                  {project.complexity}
+                </span>
+                <span className="text-xs" style={{ color: '#9b9b9b' }}>
+                  {project.topic}
+                </span>
+              </div>
+              <h1 className="font-serif text-2xl font-semibold leading-snug">
+                {project.title}
+              </h1>
+              <p className="text-sm leading-relaxed" style={{ color: '#4b4b4b' }}>
+                {project.description}
+              </p>
+            </div>
+
+            {/* Roadmap */}
+            <div className="space-y-4">
+              <div
+                className="pb-3"
+                style={{ borderBottom: '1px solid #e8e3da' }}
+              >
+                <h2 className="font-serif text-base font-semibold" style={{ color: '#1c1c1c' }}>
+                  Your roadmap
+                </h2>
+                <p className="text-xs mt-0.5" style={{ color: '#9b9b9b' }}>
+                  Complete milestones in order. Each one ends with something you can verify.
+                </p>
+              </div>
+
+              {milestones.length === 0 ? (
+                <MilestoneGenerator projectId={params.id} />
+              ) : (
+                <MilestoneRoadmap milestones={milestones} projectId={params.id} />
+              )}
+            </div>
+
           </div>
-          <h1 className="font-serif text-2xl font-semibold leading-snug">
-            {project.title}
-          </h1>
-          <p className="text-sm leading-relaxed" style={{ color: '#4b4b4b' }}>
-            {project.description}
-          </p>
+
+          {/* Help sidebar — visible on desktop only, sticky */}
+          <DesktopHelpSidebar />
+
         </div>
-
-        {/* Roadmap section */}
-        <div className="space-y-4">
-          <div
-            className="pb-3"
-            style={{ borderBottom: '1px solid #e8e3da' }}
-          >
-            <h2 className="font-serif text-base font-semibold" style={{ color: '#1c1c1c' }}>
-              Your roadmap
-            </h2>
-            <p className="text-xs mt-0.5" style={{ color: '#9b9b9b' }}>
-              Complete milestones in order. Each one ends with something you can verify.
-            </p>
-          </div>
-
-          {milestones.length === 0 ? (
-            <MilestoneGenerator projectId={params.id} />
-          ) : (
-            <MilestoneRoadmap milestones={milestones} projectId={params.id} />
-          )}
-        </div>
-
       </div>
     </main>
   )
