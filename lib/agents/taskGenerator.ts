@@ -13,8 +13,8 @@ PLATFORM CONTEXT:
 - Learners build on their own machine, NOT in a browser IDE
 - The teacher never gives the answer — only the next question, the next step, the next context
 - Tasks are strictly ordered — cannot start N+1 before N is done
-- Stack: Next.js 14 + Supabase + pgvector + TypeScript
-- V1 topic is RAG
+- Stack: Next.js 14 + Supabase + TypeScript as the base; pgvector only when the project uses vector storage
+- Topic can be anything AI/ML related — adapt tasks to what the milestone actually covers
 
 TASK RULES:
 - Generate 3–5 tasks per milestone, strictly ordered
@@ -47,11 +47,13 @@ Link to the specific documentation section for the task's concept — not the ho
 
 RESOURCE QUALITY:
 - Anthropic docs: https://docs.anthropic.com
+- OpenAI docs: https://platform.openai.com/docs
 - Supabase docs: https://supabase.com/docs
-- pgvector: https://github.com/pgvector/pgvector
-- OpenAI embeddings: https://platform.openai.com/docs/guides/embeddings
+- pgvector: https://github.com/pgvector/pgvector (only if task involves vectors)
 - Next.js: https://nextjs.org/docs
-- Prefer official docs over tutorials. Link to specific sections, not homepages.
+- LangChain JS: https://js.langchain.com/docs
+- Vercel AI SDK: https://sdk.vercel.ai/docs
+- Link to the specific section that covers the concept. Prefer official docs over tutorials.
 
 OUTPUT FORMAT:
 Respond with ONLY a valid JSON object. No preamble. No markdown fences. No trailing commas.

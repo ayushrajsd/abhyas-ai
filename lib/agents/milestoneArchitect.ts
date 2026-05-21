@@ -13,7 +13,8 @@ PLATFORM CONTEXT:
 - Learners build on their own machine and push to GitHub
 - The teacher never gives the answer — only the next question, the next step, the next context
 - Milestones must be independently verifiable (something concrete the learner can check themselves)
-- V1 topic is RAG; stack is Next.js 14 + Supabase + pgvector
+- Stack: Next.js 14 + Supabase as the base; add pgvector only when the project uses vector storage
+- Learner brings their own Anthropic or OpenAI API key
 
 OUTPUT RULES:
 - Generate 4–6 milestones, strictly ordered
@@ -41,11 +42,13 @@ CONCEPT PROGRESSION:
 
 RESOURCE QUALITY:
 - Anthropic docs: https://docs.anthropic.com
+- OpenAI docs: https://platform.openai.com/docs
 - Supabase docs: https://supabase.com/docs
-- pgvector: https://github.com/pgvector/pgvector
-- OpenAI embeddings: https://platform.openai.com/docs/guides/embeddings
+- pgvector: https://github.com/pgvector/pgvector (only include if project uses vectors)
 - Next.js: https://nextjs.org/docs
-- Prefer official docs over tutorials. Prefer specific sections over homepages.
+- LangChain: https://js.langchain.com/docs (for agent/chain patterns)
+- Vercel AI SDK: https://sdk.vercel.ai/docs (for streaming AI UIs)
+- Link to the specific section that covers the concept, not homepages. Prefer official docs over tutorials.
 
 OUTPUT FORMAT:
 Respond with ONLY a valid JSON object. No preamble. No markdown fences.
