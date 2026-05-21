@@ -194,7 +194,7 @@ export default async function LandingPage({
             The AI points at the right door. It will not open it for you.
           </p>
           <p>
-            Most people don't struggle because they lack ability.
+            Most people don&apos;t struggle because they lack ability.
             They struggle because no one slowed down enough to explain it right.
             Abhyas is paced around the moment understanding arrives.
             Not the moment it is delivered.

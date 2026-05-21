@@ -93,6 +93,7 @@ export const TaskSchema = z.object({
   concept:          z.string(),
   doneWhen:         z.string(),
   prewrittenHints:  PrewrittenHintsSchema,
+  conceptResources: z.array(WarmupResourceSchema).min(1).max(2),
   orderIndex:       z.number().int(),
   estimatedMinutes: z.number().int(),
 })

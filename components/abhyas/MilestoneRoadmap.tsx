@@ -46,9 +46,8 @@ const RESOURCE_TYPE_COLORS: Record<WarmupResource['type'], { bg: string; text: s
   interactive: { bg: '#eff6ff', text: '#1e40af' },
 }
 
-function WarmupShelf({ resources }: { resources: WarmupResource[] }) {
-  // Start expanded — reading these is the first thing a learner should do
-  const [collapsed, setCollapsed] = useState(false)
+export function WarmupShelf({ resources, startCollapsed = false }: { resources: WarmupResource[]; startCollapsed?: boolean }) {
+  const [collapsed, setCollapsed] = useState(startCollapsed)
 
   if (resources.length === 0) return null
 
@@ -141,7 +140,7 @@ function WarmupShelf({ resources }: { resources: WarmupResource[] }) {
   )
 }
 
-function SetupChecklist({ items }: { items: SetupItem[] }) {
+export function SetupChecklist({ items }: { items: SetupItem[] }) {
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set())
 
   const toggle = (i: number) => {

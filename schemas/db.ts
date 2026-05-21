@@ -94,6 +94,7 @@ export const TaskRowSchema = z.object({
   concept:           z.string(),
   done_when:         z.string(),
   prewritten_hints:  PrewrittenHintsSchema,
+  concept_resources: z.array(WarmupResourceSchema).default([]),
   order_index:       z.number().int(),
   status:            TaskStatusSchema,
   estimated_minutes: z.number().int().nullable(),
