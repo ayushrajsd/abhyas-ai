@@ -26,7 +26,7 @@ function ConceptResourceShelf({ resources, concept }: { resources: WarmupResourc
         style={{ backgroundColor: '#faf8f4' }}
       >
         <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#6b6b6b' }}>
-          Learn this concept — {concept}
+          Learn this concept: {concept}
         </span>
         <svg
           width="14"
@@ -80,12 +80,12 @@ function HintShelf({ hints }: { hints: { l1: string; l2: string; l3: string } })
         className="text-xs font-medium px-3 py-1.5 rounded-md transition-opacity hover:opacity-70"
         style={{ backgroundColor: '#f0ebe2', color: '#6b4f2a' }}
       >
-        I&apos;m stuck — show a hint
+        I&apos;m stuck, show a hint
       </button>
     )
   }
 
-  const HINT_LABELS = ['', 'Hint 1 — Conceptual', 'Hint 2 — Directional', 'Hint 3 — Concrete']
+  const HINT_LABELS = ['', 'Hint 1: Conceptual', 'Hint 2: Directional', 'Hint 3: Concrete']
   const HINT_VALUES = ['', hints.l1, hints.l2, hints.l3]
 
   return (
@@ -110,7 +110,7 @@ function HintShelf({ hints }: { hints: { l1: string; l2: string; l3: string } })
           className="text-xs font-medium px-3 py-1.5 rounded-md transition-opacity hover:opacity-70"
           style={{ backgroundColor: '#f0ebe2', color: '#6b4f2a' }}
         >
-          Still stuck — next hint
+          Still stuck, next hint
         </button>
       )}
     </div>
