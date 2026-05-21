@@ -293,19 +293,11 @@ function ActiveMilestoneCard({ milestone, projectId, total }: { milestone: Miles
           </div>
         )}
 
-        {/* Warm-up shelf */}
+        {/* Resource count hint — full warm-up shelf is on the milestone page */}
         {milestone.warmup_resources.length > 0 && (
-          <WarmupShelf resources={milestone.warmup_resources} />
-        )}
-
-        {/* Setup checklist */}
-        {milestone.setup_checklist && milestone.setup_checklist.length > 0 && (
-          <div
-            className="rounded-xl p-4"
-            style={{ backgroundColor: '#f7f4ef', border: '1px solid #e8e3da' }}
-          >
-            <SetupChecklist items={milestone.setup_checklist} />
-          </div>
+          <p className="text-xs" style={{ color: '#7a9e8a' }}>
+            📖 {milestone.warmup_resources.length} warm-up {milestone.warmup_resources.length === 1 ? 'resource' : 'resources'} waiting inside
+          </p>
         )}
 
         {/* CTA */}
