@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateAndSaveTasks } from '@/actions/agents'
 
@@ -8,6 +8,7 @@ export function TaskGenerator({ milestoneId }: { milestoneId: string }) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [retrying, setRetrying] = useState(false)
+  const calledRef = useRef(false)
 
   async function generate() {
     setError(null)
@@ -22,6 +23,8 @@ export function TaskGenerator({ milestoneId }: { milestoneId: string }) {
   }
 
   useEffect(() => {
+    if (calledRef.current) return
+    calledRef.current = true
     generate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [milestoneId])
