@@ -15,6 +15,8 @@ import {
 import type { SavedIdea } from '@/actions/agents'
 import type { ProjectIdea } from '@/schemas/agents'
 
+const SESSION_KEY = 'abhyas_search_results'
+
 export function DashboardClient({ username }: { username: string }) {
   const router = useRouter()
   const [topic, setTopic] = useState('')
@@ -28,23 +30,52 @@ export function DashboardClient({ username }: { username: string }) {
 
   const hasResults = projects.length > 0 || isLoading
 
+  // Persist results to sessionStorage on every update so navigating back restores them
+  // even if the user clicks a card before streaming finishes
+  useEffect(() => {
+    if (projects.length > 0 && topic) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({ topic, projects }))
+      } catch { /* sessionStorage unavailable */ }
+    }
+  }, [projects, topic])
+
   useEffect(() => {
     getSavedProjects().then(setSavedIdeas).catch(() => {})
+
+    // Restore previous search results when navigating back
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY)
+      if (stored) {
+        const { topic: t, projects: p } = JSON.parse(stored) as {
+          topic: string
+          skillLevel: string
+          projects: ProjectIdea[]
+        }
+        if (p.length > 0) {
+          setTopic(t)
+          setProjects(p)
+        }
+      }
+    } catch {
+      // sessionStorage unavailable or corrupted — start fresh
+    }
   }, [])
 
   const savedTitles = new Set(savedIdeas.map(s => s.title))
 
-  const handleSubmit = useCallback(async (submittedTopic: string, skillLevel: string) => {
+  const handleSubmit = useCallback(async (submittedTopic: string, submittedSkillLevel: string) => {
     setIsLoading(true)
     setProjects([])
     setError(null)
     setTopic(submittedTopic)
+    try { sessionStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
 
     try {
       const res = await fetch('/api/projects/ideate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: submittedTopic, skillLevel }),
+        body: JSON.stringify({ topic: submittedTopic, skillLevel: submittedSkillLevel }),
       })
 
       if (!res.ok) {
@@ -180,6 +211,7 @@ export function DashboardClient({ username }: { username: string }) {
               onClick={() => {
                 setProjects([])
                 setError(null)
+                try { sessionStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
               className="text-xs underline underline-offset-2"

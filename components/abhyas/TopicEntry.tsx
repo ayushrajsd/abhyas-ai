@@ -30,14 +30,14 @@ export function TopicEntry({ onSubmit, isLoading }: TopicEntryProps) {
           What do you want to build?
         </label>
         <p className="text-sm" style={{ color: '#6b6b6b' }}>
-          Start with RAG. Build on your own machine. Push to GitHub when done.
+          Pick any domain. Build something real with AI. Push to GitHub when done.
         </p>
       </div>
 
       <input
         id="topic-input"
         type="text"
-        placeholder="e.g. RAG, embeddings, semantic search"
+        placeholder="e.g. e-commerce, RAG, healthcare, finance, Next.js"
         value={topic}
         onChange={e => setTopic(e.target.value)}
         onKeyDown={handleKeyDown}

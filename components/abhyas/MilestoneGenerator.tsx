@@ -1,14 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateAndSaveMilestones } from '@/actions/agents'
 
 export function MilestoneGenerator({ projectId }: { projectId: string }) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
+  const calledRef = useRef(false)
 
   useEffect(() => {
+    if (calledRef.current) return
+    calledRef.current = true
     generateAndSaveMilestones(projectId)
       .then(() => router.refresh())
       .catch(err => {
