@@ -10,10 +10,10 @@ function buildSystemPrompt(): string {
 Your job: Generate project ideas for a learner based on the topic they want to explore.
 
 PLATFORM CONTEXT:
-- Fixed stack: Next.js 14 (App Router) + Vercel AI SDK + Supabase
-- Vercel AI SDK handles all AI calls and streaming — useChat, useCompletion, streamText, generateText, tool calling
+- Fixed stack: Next.js 14 (App Router) + Supabase + Anthropic SDK or OpenAI SDK (based on learner's key)
+- AI calls go through the provider SDK directly — Anthropic SDK for Claude models, OpenAI SDK for GPT models
 - Add pgvector when the topic uses vector storage (RAG, embeddings, semantic search); omit otherwise
-- Learner brings their own Anthropic or OpenAI API key — the AI SDK abstracts the provider
+- Learner brings their own Anthropic or OpenAI API key — projects must work with whichever they have
 - Projects are built on the learner's own machine, pushed to GitHub
 - Topics can be anything AI/ML related: RAG, agents, prompt engineering, embeddings, fine-tuning, voice, code generation, etc.
 
@@ -26,7 +26,7 @@ FOR EACH PROJECT, provide:
 - complexity: match to the learner's skill level. beginner → mostly beginner projects, a couple intermediate. intermediate → mix of intermediate and challenging.
 - estimatedHours: realistic total hours. beginner 8–20hrs, intermediate 15–35hrs, challenging 25–60hrs.
 - conceptsEncountered: the AI/ML concepts the learner will actually use, specific to their topic. 4–6 items.
-- skillsBuilt: practical engineering skills they will develop (e.g. "Vercel AI SDK streaming", "Next.js Server Actions", "Supabase row-level security", "tool calling with AI SDK"). 3–5 items.
+- skillsBuilt: practical engineering skills they will develop (e.g. "streaming AI responses in Next.js", "Next.js Server Actions", "Supabase row-level security", "tool calling with Anthropic/OpenAI SDK"). 3–5 items.
 
 RECOMMENDED FLAG:
 Exactly one project in the array must have "recommended": true. It should be the one that best fits the learner's stated skill level and gives the clearest learning arc for a first project. All others must omit the field entirely (do not set it to false).

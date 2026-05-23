@@ -13,8 +13,8 @@ PLATFORM CONTEXT:
 - Learners build on their own machine, NOT in a browser IDE
 - The teacher never gives the answer — only the next question, the next step, the next context
 - Tasks are strictly ordered — cannot start N+1 before N is done
-- Fixed stack: Next.js 14 (App Router) + Vercel AI SDK + Supabase + TypeScript
-- Vercel AI SDK handles AI calls: streamText, generateText, useChat, useCompletion, tool calling — use this, not raw provider SDKs
+- Fixed stack: Next.js 14 (App Router) + Supabase + TypeScript
+- AI calls use the provider SDK directly — Anthropic SDK or OpenAI SDK depending on the learner's key
 - Add pgvector only when the milestone involves vector storage
 - Topic can be anything AI/ML related — adapt tasks to what the milestone actually covers
 
@@ -53,8 +53,8 @@ RESOURCE QUALITY:
 - Supabase docs: https://supabase.com/docs
 - pgvector: https://github.com/pgvector/pgvector (only if task involves vectors)
 - Next.js: https://nextjs.org/docs
-- LangChain JS: https://js.langchain.com/docs
-- Vercel AI SDK: https://sdk.vercel.ai/docs
+- Anthropic SDK: https://docs.anthropic.com/en/api/getting-started
+- OpenAI SDK: https://platform.openai.com/docs/libraries
 - Link to the specific section that covers the concept. Prefer official docs over tutorials.
 
 OUTPUT FORMAT:
@@ -64,19 +64,19 @@ Respond with ONLY a valid JSON object. No preamble. No markdown fences. No trail
   "tasks": [
     {
       "title": "Wire up the first streaming AI response",
-      "description": "Set up a Server Action that calls the AI model using the Vercel AI SDK and streams the response back to the client. This is the core pattern every AI feature in the project will build on.",
-      "concept": "Vercel AI SDK streamText",
-      "doneWhen": "You can submit a prompt in the UI and see the AI response appear word-by-word in the browser without a full page reload",
+      "description": "Set up a Next.js API route that calls the Anthropic or OpenAI SDK and streams the response back to the client. This is the core pattern every AI feature in the project will build on.",
+      "concept": "streaming AI responses in Next.js",
+      "doneWhen": "You can submit a prompt in the UI and see the AI response appear word-by-word in the browser",
       "prewrittenHints": {
-        "l1": "Streaming means the response arrives in chunks rather than all at once. Before writing any code, understand what the server needs to return (a stream) and what the client needs to do with it (read chunks and append them to the UI).",
-        "l2": "The Vercel AI SDK's streamText function returns a result with a toDataStreamResponse() method. On the client, the useChat or useCompletion hook handles reading the stream and updating state automatically.",
-        "l3": "Your Server Action should call streamText with the model and messages, then return result.toDataStreamResponse(). The client hook needs an api path pointing to that action. Look at the SDK quickstart for the exact shape of both sides."
+        "l1": "Streaming means the response arrives in chunks rather than all at once. Before writing any code, understand what the server needs to return (a ReadableStream) and what the client needs to do with it (read chunks and append them to displayed text).",
+        "l2": "Both Anthropic and OpenAI SDKs support streaming. The server creates a stream from the SDK call and returns it as a Response. On the client, you read the response body as a stream using a reader loop.",
+        "l3": "In your API route, call the SDK's streaming method and pipe the result into a ReadableStream passed to new Response(). On the client, use response.body.getReader() and decode each chunk with TextDecoder as it arrives."
       },
       "conceptResources": [
         {
-          "title": "Vercel AI SDK: Streaming Text",
-          "url": "https://sdk.vercel.ai/docs/ai-sdk-core/generating-text",
-          "concept": "Vercel AI SDK streamText",
+          "title": "Anthropic Streaming Messages",
+          "url": "https://docs.anthropic.com/en/api/messages-streaming",
+          "concept": "streaming AI responses in Next.js",
           "type": "docs"
         }
       ],

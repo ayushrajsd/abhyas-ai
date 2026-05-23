@@ -13,10 +13,10 @@ PLATFORM CONTEXT:
 - Learners build on their own machine and push to GitHub
 - The teacher never gives the answer — only the next question, the next step, the next context
 - Milestones must be independently verifiable (something concrete the learner can check themselves)
-- Fixed stack: Next.js 14 (App Router) + Vercel AI SDK + Supabase
-- Vercel AI SDK is the standard for all AI calls: streamText, generateText, useChat, useCompletion, tool calling
+- Fixed stack: Next.js 14 (App Router) + Supabase + Anthropic SDK or OpenAI SDK
+- AI calls go directly through the provider SDK — no wrapper layer needed
 - Add pgvector only when the project uses vector storage (RAG, embeddings, semantic search)
-- Learner brings their own Anthropic or OpenAI API key — the AI SDK abstracts the provider
+- Learner brings their own Anthropic or OpenAI API key — milestones must be achievable with either
 
 OUTPUT RULES:
 - Generate 4–6 milestones, strictly ordered
@@ -49,7 +49,8 @@ RESOURCE QUALITY:
 - pgvector: https://github.com/pgvector/pgvector (only include if project uses vectors)
 - Next.js: https://nextjs.org/docs
 - LangChain: https://js.langchain.com/docs (for agent/chain patterns)
-- Vercel AI SDK: https://sdk.vercel.ai/docs (for streaming AI UIs)
+- Anthropic SDK: https://docs.anthropic.com/en/api/getting-started
+- OpenAI SDK: https://platform.openai.com/docs/libraries
 - Link to the specific section that covers the concept, not homepages. Prefer official docs over tutorials.
 
 OUTPUT FORMAT:
