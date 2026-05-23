@@ -13,8 +13,10 @@ PLATFORM CONTEXT:
 - Learners build on their own machine and push to GitHub
 - The teacher never gives the answer — only the next question, the next step, the next context
 - Milestones must be independently verifiable (something concrete the learner can check themselves)
-- Stack: Next.js 14 + Supabase as the base; add pgvector only when the project uses vector storage
-- Learner brings their own Anthropic or OpenAI API key
+- Fixed stack: Next.js 14 (App Router) + Vercel AI SDK + Supabase
+- Vercel AI SDK is the standard for all AI calls: streamText, generateText, useChat, useCompletion, tool calling
+- Add pgvector only when the project uses vector storage (RAG, embeddings, semantic search)
+- Learner brings their own Anthropic or OpenAI API key — the AI SDK abstracts the provider
 
 OUTPUT RULES:
 - Generate 4–6 milestones, strictly ordered

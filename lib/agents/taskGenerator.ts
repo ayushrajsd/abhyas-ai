@@ -13,7 +13,9 @@ PLATFORM CONTEXT:
 - Learners build on their own machine, NOT in a browser IDE
 - The teacher never gives the answer — only the next question, the next step, the next context
 - Tasks are strictly ordered — cannot start N+1 before N is done
-- Stack: Next.js 14 + Supabase + TypeScript as the base; pgvector only when the project uses vector storage
+- Fixed stack: Next.js 14 (App Router) + Vercel AI SDK + Supabase + TypeScript
+- Vercel AI SDK handles AI calls: streamText, generateText, useChat, useCompletion, tool calling — use this, not raw provider SDKs
+- Add pgvector only when the milestone involves vector storage
 - Topic can be anything AI/ML related — adapt tasks to what the milestone actually covers
 
 TASK RULES:
@@ -61,20 +63,20 @@ Respond with ONLY a valid JSON object. No preamble. No markdown fences. No trail
 {
   "tasks": [
     {
-      "title": "Create the document embedding function",
-      "description": "Write the function that calls the embeddings API and returns a vector for any text input. This becomes the single embedding utility your entire RAG pipeline depends on.",
-      "concept": "OpenAI Embeddings API",
-      "doneWhen": "You can call your function with a test string and see an array of 1536 numbers logged to the console",
+      "title": "Wire up the first streaming AI response",
+      "description": "Set up a Server Action that calls the AI model using the Vercel AI SDK and streams the response back to the client. This is the core pattern every AI feature in the project will build on.",
+      "concept": "Vercel AI SDK streamText",
+      "doneWhen": "You can submit a prompt in the UI and see the AI response appear word-by-word in the browser without a full page reload",
       "prewrittenHints": {
-        "l1": "Embeddings convert text into a numerical fingerprint. Before writing the API call, think about what your function should receive (a string) and what it should return (an array of numbers). Then read the embeddings guide to understand the response shape.",
-        "l2": "The embeddings endpoint takes a model name and an input string. The response nests the vector under data[0].embedding. Look at the API reference for the exact request shape — pay attention to which model name you use.",
-        "l3": "You need the embeddings create method with model and input fields in the request object. The returned object has a data array, and the first element has an embedding property which is your vector. Type it out from the TypeScript types rather than copying — each field name matters."
+        "l1": "Streaming means the response arrives in chunks rather than all at once. Before writing any code, understand what the server needs to return (a stream) and what the client needs to do with it (read chunks and append them to the UI).",
+        "l2": "The Vercel AI SDK's streamText function returns a result with a toDataStreamResponse() method. On the client, the useChat or useCompletion hook handles reading the stream and updating state automatically.",
+        "l3": "Your Server Action should call streamText with the model and messages, then return result.toDataStreamResponse(). The client hook needs an api path pointing to that action. Look at the SDK quickstart for the exact shape of both sides."
       },
       "conceptResources": [
         {
-          "title": "OpenAI Embeddings Guide",
-          "url": "https://platform.openai.com/docs/guides/embeddings",
-          "concept": "OpenAI Embeddings API",
+          "title": "Vercel AI SDK: Streaming Text",
+          "url": "https://sdk.vercel.ai/docs/ai-sdk-core/generating-text",
+          "concept": "Vercel AI SDK streamText",
           "type": "docs"
         }
       ],
