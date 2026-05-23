@@ -30,6 +30,16 @@ export function DashboardClient({ username }: { username: string }) {
 
   const hasResults = projects.length > 0 || isLoading
 
+  // Persist results to sessionStorage on every update so navigating back restores them
+  // even if the user clicks a card before streaming finishes
+  useEffect(() => {
+    if (projects.length > 0 && topic) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({ topic, projects }))
+      } catch { /* sessionStorage unavailable */ }
+    }
+  }, [projects, topic])
+
   useEffect(() => {
     getSavedProjects().then(setSavedIdeas).catch(() => {})
 
@@ -61,8 +71,6 @@ export function DashboardClient({ username }: { username: string }) {
     setTopic(submittedTopic)
     try { sessionStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
 
-    const accumulated: ProjectIdea[] = []
-
     try {
       const res = await fetch('/api/projects/ideate', {
         method: 'POST',
@@ -92,23 +100,12 @@ export function DashboardClient({ username }: { username: string }) {
           if (!line.trim()) continue
           try {
             const project = JSON.parse(line) as ProjectIdea
-            accumulated.push(project)
             setProjects(prev => [...prev, project])
           } catch {
             // malformed line: skip
           }
         }
       }
-
-      // Persist results so "Back to results" restores without regenerating
-      try {
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-          topic: submittedTopic,
-          skillLevel: submittedSkillLevel,
-          projects: accumulated,
-        }))
-      } catch { /* sessionStorage full or unavailable */ }
-
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
