@@ -15,6 +15,8 @@ import {
 import type { SavedIdea } from '@/actions/agents'
 import type { ProjectIdea } from '@/schemas/agents'
 
+const SESSION_KEY = 'abhyas_search_results'
+
 export function DashboardClient({ username }: { username: string }) {
   const router = useRouter()
   const [topic, setTopic] = useState('')
@@ -30,21 +32,42 @@ export function DashboardClient({ username }: { username: string }) {
 
   useEffect(() => {
     getSavedProjects().then(setSavedIdeas).catch(() => {})
+
+    // Restore previous search results when navigating back
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY)
+      if (stored) {
+        const { topic: t, projects: p } = JSON.parse(stored) as {
+          topic: string
+          skillLevel: string
+          projects: ProjectIdea[]
+        }
+        if (p.length > 0) {
+          setTopic(t)
+          setProjects(p)
+        }
+      }
+    } catch {
+      // sessionStorage unavailable or corrupted — start fresh
+    }
   }, [])
 
   const savedTitles = new Set(savedIdeas.map(s => s.title))
 
-  const handleSubmit = useCallback(async (submittedTopic: string, skillLevel: string) => {
+  const handleSubmit = useCallback(async (submittedTopic: string, submittedSkillLevel: string) => {
     setIsLoading(true)
     setProjects([])
     setError(null)
     setTopic(submittedTopic)
+    try { sessionStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
+
+    const accumulated: ProjectIdea[] = []
 
     try {
       const res = await fetch('/api/projects/ideate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: submittedTopic, skillLevel }),
+        body: JSON.stringify({ topic: submittedTopic, skillLevel: submittedSkillLevel }),
       })
 
       if (!res.ok) {
@@ -69,12 +92,23 @@ export function DashboardClient({ username }: { username: string }) {
           if (!line.trim()) continue
           try {
             const project = JSON.parse(line) as ProjectIdea
+            accumulated.push(project)
             setProjects(prev => [...prev, project])
           } catch {
             // malformed line: skip
           }
         }
       }
+
+      // Persist results so "Back to results" restores without regenerating
+      try {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+          topic: submittedTopic,
+          skillLevel: submittedSkillLevel,
+          projects: accumulated,
+        }))
+      } catch { /* sessionStorage full or unavailable */ }
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -180,6 +214,7 @@ export function DashboardClient({ username }: { username: string }) {
               onClick={() => {
                 setProjects([])
                 setError(null)
+                try { sessionStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
               className="text-xs underline underline-offset-2"
