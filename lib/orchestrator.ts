@@ -25,6 +25,7 @@ export async function handleCompleteTask(
 
   if (taskError || !task) throw new Error('Task not found')
 
+    // the below checks are not for one to many checks but for run time type checks
   const milestone = Array.isArray(task.milestones) ? task.milestones[0] : task.milestones
   const project = Array.isArray(milestone.projects) ? milestone.projects[0] : milestone.projects
 
