@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { TopicEntry } from "@/components/abhyas/TopicEntry";
 import { ProjectIdeaCard } from "@/components/abhyas/ProjectIdeaCard";
 import { SavedIdeasSection } from "@/components/abhyas/SavedIdeasSection";
+import { ActiveProjectsSection } from "@/components/abhyas/ActiveProjectsSection";
 import {
   selectProject,
   getSavedProjects,
@@ -30,6 +31,9 @@ export function DashboardClient({ username }: { username: string }) {
   const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>([]);
   const [activeProjects, setActiveProjects] = useState<ActiveProject[]>([]);
   const [startingId, setStartingId] = useState<string | null>(null);
+  const [resumingProjectId, setResumingProjectId] = useState<string | null>(
+    null,
+  );
 
   const hasResults = projects.length > 0 || isLoading;
 
@@ -267,17 +271,14 @@ export function DashboardClient({ username }: { username: string }) {
   return (
     <div className="space-y-10">
       {activeProjects.length > 0 && (
-        <div>
-          Continue Learning
-          {activeProjects.map((project) => (
-            <div>
-              {project.title} {project.topic}
-              <button onClick={() => router.push(`/projects/${project.id}`)}>
-                Resume
-              </button>
-            </div>
-          ))}
-        </div>
+        <ActiveProjectsSection
+          projects={activeProjects}
+          onResume={(project) => {
+            setResumingProjectId(project.id);
+            router.push(`/projects/${project.id}`);
+          }}
+          resumingProjectId={resumingProjectId}
+        />
       )}
       <SavedIdeasSection
         ideas={savedIdeas}

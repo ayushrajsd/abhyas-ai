@@ -218,8 +218,6 @@ export async function getActiveProjects(): Promise<ActiveProject[]> {
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
-  // console.log("activeProjects");
-  // console.log(data);
   return (data ?? []) as ActiveProject[];
 }
 export async function bookmarkProject(
