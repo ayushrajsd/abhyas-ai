@@ -1,4 +1,5 @@
 # Phase 05 — Agent 3: Task Generator + Task Flow + Orchestrator
+
 ## Read CLAUDE.md first. Then read this file completely before writing a single line of code.
 
 ---
@@ -12,16 +13,19 @@ CLAUDE.md and phase-04 say the setup checklist is generated for Milestone 1 only
 The correct behaviour is: Agent 2 generates a `setup_checklist` for **any milestone that introduces new environment requirements** — a new service, a new API key, a new env var, a new Supabase migration. Milestones with no new environment setup get `null`.
 
 Real examples that warrant a checklist on later milestones:
+
 - Milestone 2 adds pgvector embeddings → needs `OPENAI_API_KEY` in `.env.local` and a new migration
 - Milestone 3 adds Langfuse observability → needs `LANGFUSE_SECRET_KEY` and `LANGFUSE_PUBLIC_KEY`
 - Milestone 4 adds GitHub verification → needs `github_repo_token` OAuth flow
 
 **What this means for Phase 5:**
+
 - `SetupChecklist` component renders whenever `milestone.setup_checklist` is non-null — on any milestone, not just `order_index === 0`
 - The milestone page checks `setup_checklist !== null`, not `order_index === 0`
 - The `assertSetupChecklistPosition` validator from phase-04 is NOT implemented — it enforces the wrong rule
 
 **What stays the same:**
+
 - Agent 2's system prompt (already implemented in Phase 4) — if it only generates checklists for Milestone 1, that's acceptable for now. The prompt can be improved when Agent 2 is revisited. The UI just needs to be ready to show a checklist on any milestone.
 - DB schema — `setup_checklist jsonb nullable` on `milestones` is already correct from phase-02 migration
 
@@ -43,6 +47,7 @@ This is the core learning loop. Everything before this phase was setup. This pha
 7. `components/SetupChecklist.tsx` — checkable items with commands, shown on any milestone that has setup requirements
 
 **Agent 3 runs at two moments:**
+
 - **Eagerly** — immediately after Agent 2 finishes (Phase 4), tasks for Milestone 1 are generated and saved before the learner arrives at the milestone page. No wait when they click in.
 - **Lazily** — when the last task of a milestone is marked done, tasks for the next milestone are generated in the background before the transition.
 
@@ -82,6 +87,7 @@ No new packages. All dependencies from Phase 3 cover this phase.
 ### 1. `lib/agents/taskGenerator.ts`
 
 Agent 3 makes two LLM calls in one function:
+
 - **Call 1 (`fast` tier):** Generate task structure — title, description, concept, doneWhen, estimatedMinutes
 - **Call 2 (`capable` tier):** Generate pre-written hints for each task — L1, L2, L3, calibrated by complexity
 
@@ -91,19 +97,20 @@ Two calls because the quality requirements differ. Task structure is determinist
 
 ```typescript
 function buildTaskStructurePrompt(complexity: string): string {
-  const doneWhenGuidance = {
-    beginner: `doneWhen must be mechanical and specific. Name the exact endpoint, exact response shape, or exact UI state.
+  const doneWhenGuidance =
+    {
+      beginner: `doneWhen must be mechanical and specific. Name the exact endpoint, exact response shape, or exact UI state.
 Example: "POST to /api/embed with {"text": "hello"} returns {"embedding": [0.023, -0.14, ...]}"
 The learner should be able to verify completion without any judgment call.`,
 
-    intermediate: `doneWhen must be outcome-based. Describe what should work, not how it should look.
+      intermediate: `doneWhen must be outcome-based. Describe what should work, not how it should look.
 Example: "Semantic search returns meaningfully different results for semantically different queries."
 Some judgment is required — that's intentional.`,
 
-    challenging: `doneWhen must be quality and judgment-based. The learner defines what done looks like within a criterion.
+      challenging: `doneWhen must be quality and judgment-based. The learner defines what done looks like within a criterion.
 Example: "Retrieval quality holds up across at least 3 different document types with a latency strategy you can justify."
 The learner must reason about quality, not just check a box.`,
-  }[complexity] ?? ''
+    }[complexity] ?? "";
 
   return `You are the Task Generator for Abhyas AI — a Gurukul-philosophy learning platform.
 
@@ -140,23 +147,24 @@ Respond with ONLY a valid JSON array. No preamble. No markdown fences.
     "orderIndex": 0,
     "estimatedMinutes": 45
   }
-]`
+]`;
 }
 
 function buildHintsPrompt(complexity: string): string {
-  const hintGuidance = {
-    beginner: `L1 — Explain the concept with an analogy. Name the pattern. No implementation details.
+  const hintGuidance =
+    {
+      beginner: `L1 — Explain the concept with an analogy. Name the pattern. No implementation details.
 L2 — Point to the specific SDK function, Supabase method, or docs section the learner needs.
 L3 — Show the response shape or function signature the learner should be targeting. No complete code.`,
 
-    intermediate: `L1 — Ask a question that redirects their thinking. No explanation. No analogy.
+      intermediate: `L1 — Ask a question that redirects their thinking. No explanation. No analogy.
 L2 — Point at the right abstraction. No example. One directional sentence.
 L3 — Name the exact issue. Describe the fix in prose only. No code shape shown.`,
 
-    challenging: `L1 — Ask a single question that challenges an assumption they're making.
+      challenging: `L1 — Ask a single question that challenges an assumption they're making.
 L2 — Point at a specific docs section or a decision the learner made in a prior task/milestone.
 L3 — Name the category of the problem only. The learner figures out the fix.`,
-  }[complexity] ?? ''
+    }[complexity] ?? "";
 
   return `You are generating pre-written hints for tasks in an AI learning platform.
 Philosophy: Never give the answer. Illuminate the path, never walk it.
@@ -173,126 +181,134 @@ ABSOLUTE RULES (apply at all complexity levels):
 OUTPUT FORMAT:
 Given a JSON array of tasks, return a JSON array of hint objects in the same order.
 Each object: { "taskIndex": N, "l1": "...", "l2": "...", "l3": "..." }
-No preamble. No markdown fences. Valid JSON only.`
+No preamble. No markdown fences. Valid JSON only.`;
 }
 ```
 
 #### The agent function
 
 ```typescript
-import Anthropic from '@anthropic-ai/sdk'
-import OpenAI from 'openai'
-import { Langfuse } from 'langfuse'
-import { getModel, type Provider } from '@/lib/model-config'
+import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
+import { Langfuse } from "langfuse";
+import { getModel, type Provider } from "@/lib/model-config";
 import {
   Agent3InputSchema,
   Agent3OutputSchema,
   type Agent3Output,
   type Task,
-} from '@/schemas/agents'
+} from "@/schemas/agents";
 
 export async function runTaskGenerator(
   input: unknown,
   provider: Provider,
   apiKey: string,
 ): Promise<Agent3Output> {
-  const validated = Agent3InputSchema.parse(input)
-  const { complexity, milestone } = validated
+  const validated = Agent3InputSchema.parse(input);
+  const { complexity, milestone } = validated;
 
-  const langfuse = new Langfuse()
+  const langfuse = new Langfuse();
   const trace = langfuse.trace({
-    name: 'agent_3_task_generator',
+    name: "agent_3_task_generator",
     input: {
       milestoneTitle: milestone.title,
       complexity,
       skillLevel: validated.skillLevel,
     },
-  })
+  });
 
   const taskPrompt = `Generate tasks for this milestone:
 
 Milestone: ${milestone.title}
 Description: ${milestone.description}
-Concepts introduced: ${milestone.conceptsIntroduced.join(', ')}
+Concepts introduced: ${milestone.conceptsIntroduced.join(", ")}
 Project: ${validated.project.title}
-Completed milestones so far: ${validated.completedMilestones.join(', ') || 'none — this is the first milestone'}`
+Completed milestones so far: ${validated.completedMilestones.join(", ") || "none — this is the first milestone"}`;
 
-  const fastModel    = getModel(provider, 'fast')
-  const capableModel = getModel(provider, 'capable')
+  const fastModel = getModel(provider, "fast");
+  const capableModel = getModel(provider, "capable");
 
   try {
     // ── Call 1: Generate task structure (fast tier) ──────────────────────────
-    let taskStructureRaw = ''
+    let taskStructureRaw = "";
 
-    if (provider === 'anthropic') {
-      const client = new Anthropic({ apiKey })
+    if (provider === "anthropic") {
+      const client = new Anthropic({ apiKey });
       const response = await client.messages.create({
-        model:     fastModel,
+        model: fastModel,
         max_tokens: 3000,
-        system:    buildTaskStructurePrompt(complexity),
-        messages:  [{ role: 'user', content: taskPrompt }],
-      })
+        system: buildTaskStructurePrompt(complexity),
+        messages: [{ role: "user", content: taskPrompt }],
+      });
       taskStructureRaw = response.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('')
+        .filter((b) => b.type === "text")
+        .map((b) => b.text)
+        .join("");
     } else {
-      const client = new OpenAI({ apiKey })
+      const client = new OpenAI({ apiKey });
       const response = await client.responses.create({
-        model:        fastModel,
+        model: fastModel,
         instructions: buildTaskStructurePrompt(complexity),
-        input:        taskPrompt,
-      })
-      taskStructureRaw = response.output_text ?? ''
+        input: taskPrompt,
+      });
+      taskStructureRaw = response.output_text ?? "";
     }
 
-    const taskStructures = JSON.parse(taskStructureRaw) as Omit<Task, 'prewrittenHints'>[]
+    const taskStructures = JSON.parse(taskStructureRaw) as Omit<
+      Task,
+      "prewrittenHints"
+    >[];
 
     // ── Call 2: Generate hints for each task (capable tier) ──────────────────
     const hintsPromptInput = `Generate hints for these tasks:
-${JSON.stringify(taskStructures.map((t, i) => ({
-  taskIndex: i,
-  title: t.title,
-  description: t.description,
-  concept: t.concept,
-  doneWhen: t.doneWhen,
-})), null, 2)}`
+${JSON.stringify(
+  taskStructures.map((t, i) => ({
+    taskIndex: i,
+    title: t.title,
+    description: t.description,
+    concept: t.concept,
+    doneWhen: t.doneWhen,
+  })),
+  null,
+  2,
+)}`;
 
-    let hintsRaw = ''
+    let hintsRaw = "";
 
-    if (provider === 'anthropic') {
-      const client = new Anthropic({ apiKey })
+    if (provider === "anthropic") {
+      const client = new Anthropic({ apiKey });
       const response = await client.messages.create({
-        model:     capableModel,
+        model: capableModel,
         max_tokens: 4000,
-        system:    buildHintsPrompt(complexity),
-        messages:  [{ role: 'user', content: hintsPromptInput }],
-      })
+        system: buildHintsPrompt(complexity),
+        messages: [{ role: "user", content: hintsPromptInput }],
+      });
       hintsRaw = response.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('')
+        .filter((b) => b.type === "text")
+        .map((b) => b.text)
+        .join("");
     } else {
-      const client = new OpenAI({ apiKey })
+      const client = new OpenAI({ apiKey });
       const response = await client.responses.create({
-        model:        capableModel,
+        model: capableModel,
         instructions: buildHintsPrompt(complexity),
-        input:        hintsPromptInput,
-      })
-      hintsRaw = response.output_text ?? ''
+        input: hintsPromptInput,
+      });
+      hintsRaw = response.output_text ?? "";
     }
 
     const hints = JSON.parse(hintsRaw) as Array<{
-      taskIndex: number
-      l1: string
-      l2: string
-      l3: string
-    }>
+      taskIndex: number;
+      l1: string;
+      l2: string;
+      l3: string;
+    }>;
 
     // ── Merge task structure + hints ─────────────────────────────────────────
     const tasks: Task[] = taskStructures.map((t, i) => {
-      const taskHints = hints.find(h => h.taskIndex === i)
-      if (!taskHints) throw new Error(`Missing hints for task ${i}: ${t.title}`)
+      const taskHints = hints.find((h) => h.taskIndex === i);
+      if (!taskHints)
+        throw new Error(`Missing hints for task ${i}: ${t.title}`);
       return {
         ...t,
         prewrittenHints: {
@@ -300,23 +316,22 @@ ${JSON.stringify(taskStructures.map((t, i) => ({
           l2: taskHints.l2,
           l3: taskHints.l3,
         },
-      }
-    })
+      };
+    });
 
-    const output = Agent3OutputSchema.parse({ tasks })
+    const output = Agent3OutputSchema.parse({ tasks });
 
     trace.update({
       output: { taskCount: tasks.length },
       metadata: { fastModel, capableModel, provider },
-    })
+    });
 
-    return output
-
+    return output;
   } catch (err) {
-    trace.update({ metadata: { error: String(err) } })
-    throw err
+    trace.update({ metadata: { error: String(err) } });
+    throw err;
   } finally {
-    await langfuse.flushAsync()
+    await langfuse.flushAsync();
   }
 }
 ```
@@ -330,93 +345,91 @@ The orchestrator is a **deterministic switch statement**. Not an LLM. Not smart.
 The `COMPLETE_TASK` branch is the only branch built in this phase. Other branches are stubbed.
 
 ```typescript
-import { createServerClient } from '@/lib/supabase'
+import { createServerClient } from "@/lib/supabase";
 
 export type OrchestratorResult =
-  | { type: 'NEXT_TASK';        taskId: string }
-  | { type: 'MILESTONE_COMPLETE'; nextMilestoneId: string }
-  | { type: 'PROJECT_COMPLETE';  projectId: string }
-  | { type: 'ERROR';            message: string }
+  | { type: "NEXT_TASK"; taskId: string }
+  | { type: "MILESTONE_COMPLETE"; nextMilestoneId: string }
+  | { type: "PROJECT_COMPLETE"; projectId: string }
+  | { type: "ERROR"; message: string };
 
 export async function handleCompleteTask(
   taskId: string,
   milestoneId: string,
   userId: string,
 ): Promise<OrchestratorResult> {
-  const db = createServerClient()
+  const db = createServerClient();
 
   // 1. Mark the task as done
   await db
-    .from('tasks')
-    .update({ status: 'done' })
-    .eq('id', taskId)
-    .eq('milestone_id', milestoneId)
+    .from("tasks")
+    .update({ status: "done" })
+    .eq("id", taskId)
+    .eq("milestone_id", milestoneId);
 
   // 2. Is there a next task in this milestone?
   const { data: currentTask } = await db
-    .from('tasks')
-    .select('order_index')
-    .eq('id', taskId)
-    .single()
+    .from("tasks")
+    .select("order_index")
+    .eq("id", taskId)
+    .single();
 
-  if (!currentTask) return { type: 'ERROR', message: 'Task not found' }
+  if (!currentTask) return { type: "ERROR", message: "Task not found" };
 
   const { data: nextTask } = await db
-    .from('tasks')
-    .select('id')
-    .eq('milestone_id', milestoneId)
-    .eq('order_index', currentTask.order_index + 1)
-    .single()
+    .from("tasks")
+    .select("id")
+    .eq("milestone_id", milestoneId)
+    .eq("order_index", currentTask.order_index + 1)
+    .single();
 
   if (nextTask) {
     // Unlock the next task
-    await db
-      .from('tasks')
-      .update({ status: 'active' })
-      .eq('id', nextTask.id)
+    await db.from("tasks").update({ status: "active" }).eq("id", nextTask.id);
 
-    return { type: 'NEXT_TASK', taskId: nextTask.id }
+    return { type: "NEXT_TASK", taskId: nextTask.id };
   }
 
   // 3. No next task — milestone is complete
   await db
-    .from('milestones')
-    .update({ status: 'complete' })
-    .eq('id', milestoneId)
+    .from("milestones")
+    .update({ status: "complete" })
+    .eq("id", milestoneId);
 
   // 4. Is there a next milestone?
   const { data: currentMilestone } = await db
-    .from('milestones')
-    .select('order_index, project_id')
-    .eq('id', milestoneId)
-    .single()
+    .from("milestones")
+    .select("order_index, project_id")
+    .eq("id", milestoneId)
+    .single();
 
-  if (!currentMilestone) return { type: 'ERROR', message: 'Milestone not found' }
+  if (!currentMilestone)
+    return { type: "ERROR", message: "Milestone not found" };
 
   const { data: nextMilestone } = await db
-    .from('milestones')
-    .select('id')
-    .eq('project_id', currentMilestone.project_id)
-    .eq('order_index', currentMilestone.order_index + 1)
-    .single()
+    .from("milestones")
+    .select("id")
+    .eq("project_id", currentMilestone.project_id)
+    .eq("order_index", currentMilestone.order_index + 1)
+    .single();
 
   if (nextMilestone) {
     // Unlock the next milestone
     await db
-      .from('milestones')
-      .update({ status: 'active' })
-      .eq('id', nextMilestone.id)
+      .from("milestones")
+      .update({ status: "active" })
+      .eq("id", nextMilestone.id);
 
-    return { type: 'MILESTONE_COMPLETE', nextMilestoneId: nextMilestone.id }
+    return { type: "MILESTONE_COMPLETE", nextMilestoneId: nextMilestone.id };
   }
 
   // 5. No next milestone — project is complete
   await db
-    .from('projects')
-    .update({ status: 'complete' })
-    .eq('id', currentMilestone.project_id)
+    .from("projects")
+    .update({ status: "complete" })
+    .eq("id", currentMilestone.project_id);
 
-  return { type: 'PROJECT_COMPLETE', projectId: currentMilestone.project_id }
+  return { type: "PROJECT_COMPLETE", projectId: currentMilestone.project_id };
 }
 ```
 
@@ -437,71 +450,73 @@ export async function generateTasks(
   milestoneId: string,
   projectId: string,
 ): Promise<void> {
-  const supabase = createAuthClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error('Not authenticated')
+  const supabase = createAuthClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
 
-  const db = createServerClient()
+  const db = createServerClient();
 
   // Fetch everything Agent 3 needs
   const { data: user } = await db
-    .from('users')
-    .select('encrypted_api_key, api_provider, skill_level')
-    .eq('id', session.user.id)
-    .single()
+    .from("users")
+    .select("encrypted_api_key, api_provider, skill_level")
+    .eq("id", session.user.id)
+    .single();
 
-  if (!user?.encrypted_api_key) throw new Error('No API key')
+  if (!user?.encrypted_api_key) throw new Error("No API key");
 
   const { data: milestone } = await db
-    .from('milestones')
-    .select('*')
-    .eq('id', milestoneId)
-    .single()
+    .from("milestones")
+    .select("*")
+    .eq("id", milestoneId)
+    .single();
 
   const { data: project } = await db
-    .from('projects')
-    .select('*, project_idea')
-    .eq('id', projectId)
-    .single()
+    .from("projects")
+    .select("*, project_idea")
+    .eq("id", projectId)
+    .single();
 
   const { data: completedMilestones } = await db
-    .from('milestones')
-    .select('title')
-    .eq('project_id', projectId)
-    .eq('status', 'complete')
+    .from("milestones")
+    .select("title")
+    .eq("project_id", projectId)
+    .eq("status", "complete");
 
-  if (!milestone || !project) throw new Error('Milestone or project not found')
+  if (!milestone || !project) throw new Error("Milestone or project not found");
 
-  const apiKey  = decryptApiKey(user.encrypted_api_key)
-  const provider = user.api_provider as Provider
+  const apiKey = decryptApiKey(user.encrypted_api_key);
+  const provider = user.api_provider as Provider;
 
   const output = await runTaskGenerator(
     {
-      milestone:           milestone,
-      project:             project.project_idea,
-      completedMilestones: completedMilestones?.map(m => m.title) ?? [],
-      skillLevel:          user.skill_level ?? 'beginner',
-      complexity:          project.complexity,
+      milestone: milestone,
+      project: project.project_idea,
+      completedMilestones: completedMilestones?.map((m) => m.title) ?? [],
+      skillLevel: user.skill_level ?? "beginner",
+      complexity: project.complexity,
     },
     provider,
     apiKey,
-  )
+  );
 
   // Save tasks to DB — Task 0 is active, rest locked
-  const tasksToInsert = output.tasks.map(t => ({
-    milestone_id:      milestoneId,
-    title:             t.title,
-    description:       t.description,
-    concept:           t.concept,
-    done_when:         t.doneWhen,
-    prewritten_hints:  t.prewrittenHints,
-    order_index:       t.orderIndex,
-    status:            t.orderIndex === 0 ? 'active' : 'locked',
+  const tasksToInsert = output.tasks.map((t) => ({
+    milestone_id: milestoneId,
+    title: t.title,
+    description: t.description,
+    concept: t.concept,
+    done_when: t.doneWhen,
+    prewritten_hints: t.prewrittenHints,
+    order_index: t.orderIndex,
+    status: t.orderIndex === 0 ? "active" : "locked",
     estimated_minutes: t.estimatedMinutes,
-  }))
+  }));
 
-  const { error } = await db.from('tasks').insert(tasksToInsert)
-  if (error) throw new Error(`Failed to save tasks: ${error.message}`)
+  const { error } = await db.from("tasks").insert(tasksToInsert);
+  if (error) throw new Error(`Failed to save tasks: ${error.message}`);
 }
 
 // ── completeTask ────────────────────────────────────────────────────────────
@@ -514,22 +529,24 @@ export async function completeTask(
   milestoneId: string,
   projectId: string,
 ): Promise<OrchestratorResult> {
-  const supabase = createAuthClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error('Not authenticated')
+  const supabase = createAuthClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
 
-  const result = await handleCompleteTask(taskId, milestoneId, session.user.id)
+  const result = await handleCompleteTask(taskId, milestoneId, session.user.id);
 
   // If milestone just completed, generate tasks for next milestone in background
   // Don't await — learner shouldn't wait for this
-  if (result.type === 'MILESTONE_COMPLETE') {
-    generateTasks(result.nextMilestoneId, projectId).catch(err => {
-      console.error('Background task generation failed:', err)
+  if (result.type === "MILESTONE_COMPLETE") {
+    generateTasks(result.nextMilestoneId, projectId).catch((err) => {
+      console.error("Background task generation failed:", err);
       // Non-fatal — tasks will be generated on-demand when learner arrives
-    })
+    });
   }
 
-  return result
+  return result;
 }
 ```
 
@@ -992,19 +1009,24 @@ export default function ProjectCompletePage({ params }: { params: { id: string }
 
 In Phase 4's `generateMilestones()`, add task generation for Milestone 1 immediately after milestones are saved. This ensures tasks exist when the learner arrives at Milestone 1 — no wait.
 
+UPDATE:
+Milestone tasks are generated lazily when a milestone page is first opened.
+When a milestone is completed, the next milestone is unlocked and its tasks are proactively generated.
+If proactive generation fails, the milestone page fallback still generates tasks on entry.
+
 ```typescript
 // At the end of generateMilestones(), after inserting milestones:
 
 // Eagerly generate tasks for Milestone 1 — learner should not wait
-const firstMilestone = inserted?.find(m => m.order_index === 0)
+const firstMilestone = inserted?.find((m) => m.order_index === 0);
 if (firstMilestone) {
   // Generate and save Milestone 1 tasks before returning
   // This adds ~5 seconds to the "Designing your roadmap" loading state
   // but eliminates the task loading wait when learner clicks into Milestone 1
-  await generateTasks(firstMilestone.id, projectRow.id)
+  await generateTasks(firstMilestone.id, projectRow.id);
 }
 
-return firstMilestone?.id ?? inserted?.[0]?.id
+return firstMilestone?.id ?? inserted?.[0]?.id;
 ```
 
 ---
@@ -1044,6 +1066,7 @@ Two model calls per trace — both logged under the same trace. Langfuse will sh
 - **`learner_stats` updates** — Phase 8 (updated by Agent 6 at project completion)
 - **Error boundaries and loading skeletons** — Phase 8
 - **The "How to use this" sidebar** seen in the Phase 4 screenshot — if not already built, keep it on Milestone 1 only, make it dismissible
+
 ---
 
 ## Common Mistakes
@@ -1085,4 +1108,4 @@ That is Phase 5 done.
 
 ---
 
-*Next: `phase-06-agent4.md` — Nudge Agent + stuck flow + streaming nudge response.*
+_Next: `phase-06-agent4.md` — Nudge Agent + stuck flow + streaming nudge response._
