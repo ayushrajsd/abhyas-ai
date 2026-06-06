@@ -175,11 +175,13 @@ function ActiveTaskCard({
   task,
   onComplete,
   completing,
+  isLastTask,
 }: {
   task: TaskRow;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onComplete: () => any;
   completing: boolean;
+  isLastTask: boolean;
 }) {
   return (
     <div
@@ -267,7 +269,11 @@ function ActiveTaskCard({
           className="font-medium text-sm px-5 py-2.5 rounded-lg transition-opacity hover:opacity-80 disabled:opacity-50"
           style={{ backgroundColor: "#1c1c1c", color: "#f7f4ef" }}
         >
-          {completing ? "Saving…" : "Mark as complete →"}
+          {completing && isLastTask
+            ? "Completing milestone and preparing your next tasks..."
+            : completing
+              ? "Saving…"
+              : "Mark as complete →"}
         </button>
       </div>
     </div>
@@ -420,7 +426,7 @@ export function TaskList({
     | { outcome: "project_complete"; projectId: string }
     | null
   >(null);
-
+  const lastTaskId = initialTasks[initialTasks.length - 1]?.id;
   async function handleComplete(taskId: string) {
     setCompletingTaskId(taskId);
     startTransition(async () => {
@@ -464,6 +470,7 @@ export function TaskList({
               task={task}
               onComplete={() => handleComplete(task.id)}
               completing={isPending && completingTaskId === task.id}
+              isLastTask={task.id === lastTaskId}
             />
           );
         return <LockedTaskCard key={task.id} task={task} />;

@@ -354,18 +354,22 @@ export async function generateAndSaveTasks(milestoneId: string): Promise<void> {
     throw new Error("Milestone not found");
   if (userResult.error || !userResult.data) throw new Error("User not found");
 
+  const milestoneRow = milestoneResult.data;
+  const projectRow = Array.isArray(milestoneRow.projects)
+    ? milestoneRow.projects[0]
+    : milestoneRow.projects;
+  const user = userResult.data;
+
+  if (projectRow.user_id !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
   // Guard: prevent double-generation
   const { count } = await db
     .from("tasks")
     .select("id", { count: "exact", head: true })
     .eq("milestone_id", milestoneId);
   if ((count ?? 0) > 0) return;
-
-  const milestoneRow = milestoneResult.data;
-  const projectRow = Array.isArray(milestoneRow.projects)
-    ? milestoneRow.projects[0]
-    : milestoneRow.projects;
-  const user = userResult.data;
 
   if (!user.encrypted_api_key || !user.api_provider) {
     throw new Error("API key not configured.");
@@ -449,6 +453,15 @@ export async function completeTask(
 
   const db = createServerClient();
   const result = await handleCompleteTask(db, taskId, session.user.id);
+
+  if (result.outcome === "next_milestone") {
+    // generate tasks for next milestone
+    try {
+      await generateAndSaveTasks(result.milestoneId);
+    } catch (err) {
+      console.error("Task generation error:", err);
+    }
+  }
 
   // Revalidate relevant paths
   if (result.outcome === "next_task" || result.outcome === "next_milestone") {
