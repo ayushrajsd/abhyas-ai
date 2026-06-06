@@ -354,13 +354,6 @@ export async function generateAndSaveTasks(milestoneId: string): Promise<void> {
     throw new Error("Milestone not found");
   if (userResult.error || !userResult.data) throw new Error("User not found");
 
-  // Guard: prevent double-generation
-  const { count } = await db
-    .from("tasks")
-    .select("id", { count: "exact", head: true })
-    .eq("milestone_id", milestoneId);
-  if ((count ?? 0) > 0) return;
-
   const milestoneRow = milestoneResult.data;
   const projectRow = Array.isArray(milestoneRow.projects)
     ? milestoneRow.projects[0]
@@ -370,6 +363,13 @@ export async function generateAndSaveTasks(milestoneId: string): Promise<void> {
   if (projectRow.user_id !== session.user.id) {
     throw new Error("Unauthorized");
   }
+
+  // Guard: prevent double-generation
+  const { count } = await db
+    .from("tasks")
+    .select("id", { count: "exact", head: true })
+    .eq("milestone_id", milestoneId);
+  if ((count ?? 0) > 0) return;
 
   if (!user.encrypted_api_key || !user.api_provider) {
     throw new Error("API key not configured.");
