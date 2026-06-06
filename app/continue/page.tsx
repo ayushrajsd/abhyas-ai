@@ -1,9 +1,9 @@
 import { createAuthClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
-import { DashboardClient } from "./DashboardClient";
+import { ContinueClient } from "./ContinueClient";
 import { AppNavbar } from "@/components/abhyas/AppNavbar";
 
-export default async function DashboardPage() {
+export default async function ContinuePage() {
   const supabase = createAuthClient();
   const {
     data: { session },
@@ -33,12 +33,11 @@ export default async function DashboardPage() {
       />
       <AppNavbar
         userName={user.github_username}
-        activePage="dashboard"
+        activePage="continue"
         avatarUrl={user.github_avatar}
       />
-
       <main className="max-w-4xl mx-auto px-8 py-16">
-        <DashboardClient username={user.github_username ?? ""} />
+        <ContinueClient />
       </main>
     </div>
   );

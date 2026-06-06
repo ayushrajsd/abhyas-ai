@@ -40,6 +40,43 @@ Core rule:
 5. `components/abhyas/TaskList.tsx`
    - Shows the deeper nudge flow after Hint 3
 
+## Future Constraint — Limit Active Projects
+
+To encourage focus, Abhyas should limit each learner to a maximum of 3 active projects at a time.
+
+This constraint must be enforced on the server, not only in the UI.
+
+### Server Actions That Should Enforce This
+
+The rule should be checked before any project becomes `active`.
+
+Relevant actions:
+
+- `selectProject`
+  - used when a learner selects a newly generated project
+  - currently creates a project with `status = "active"`
+
+- `startSavedProject`
+  - used when a learner starts a bookmarked/saved project
+  - currently changes a saved project into an active project
+
+### Enforcement Logic
+
+Before creating or activating a project:
+
+1. Get the logged-in user from Supabase session.
+2. Count projects where:
+   - `user_id = session.user.id`
+   - `status = "active"`
+3. If active project count is already 3 or more:
+   - do not create or activate another project
+   - return a clear error message
+
+Suggested message:
+
+```txt
+You already have 3 active projects. Abhyas works best when you finish what you start. Complete or pause one project before starting another.
+
 ---
 
 ## Existing Foundation
@@ -682,3 +719,4 @@ A good nudge should be:
 - Basic safety checks are in place.
 - Anthropic and OpenAI paths both work.
 - Error states are handled gracefully.
+```
