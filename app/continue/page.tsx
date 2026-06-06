@@ -75,14 +75,6 @@ export default function ContinuePage() {
             >
               Dashboard
             </button>
-
-            <button
-              onClick={() => router.push("/saved")}
-              className="font-medium"
-              style={{ color: "#3d6b4f" }}
-            >
-              Saved Projects
-            </button>
           </div>
         </nav>
         <div className="max-w-4xl mx-auto px-8 py-16 space-y-10">
