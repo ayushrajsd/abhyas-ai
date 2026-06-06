@@ -30,17 +30,16 @@ export default async function DashboardPage() {
           background:
             "linear-gradient(90deg, #3d6b4f 0%, #7ab394 60%, #f7f4ef 100%)",
         }}
-      >
-        <AppNavbar
-          userName={user.github_username}
-          activePage="dashboard"
-          avatarUrl={user.github_avatar}
-        />
+      />
+      <AppNavbar
+        userName={user.github_username}
+        activePage="dashboard"
+        avatarUrl={user.github_avatar}
+      />
 
-        <main className="max-w-4xl mx-auto px-8 py-16">
-          <DashboardClient username={user.github_username ?? ""} />
-        </main>
-      </div>
+      <main className="max-w-4xl mx-auto px-8 py-16">
+        <DashboardClient username={user.github_username ?? ""} />
+      </main>
     </div>
   );
 }

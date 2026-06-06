@@ -12,7 +12,7 @@ import {
   removeBookmark,
   startSavedProject,
 } from "@/actions/agents";
-import type { SavedIdea, ActiveProject } from "@/actions/agents";
+import type { SavedIdea } from "@/actions/agents";
 import type { ProjectIdea } from "@/schemas/agents";
 
 const SESSION_KEY = "abhyas_search_results";

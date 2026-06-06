@@ -18,7 +18,7 @@ export function AppNavbar({ activePage, userName, avatarUrl }: NavBarProps) {
           Abhyas<span style={{ color: "#3d6b4f" }}>.ai</span>
         </span>
       </div>
-      <div className="flex items-center w-1/4 justify-between">
+      <div className="flex items-center gap-4">
         <Link
           href="/continue"
           className="text-sm font-medium transition-opacity hover:opacity-70"
