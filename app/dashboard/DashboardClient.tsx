@@ -5,20 +5,17 @@ import { useRouter } from "next/navigation";
 import { TopicEntry } from "@/components/abhyas/TopicEntry";
 import { ProjectIdeaCard } from "@/components/abhyas/ProjectIdeaCard";
 import { SavedIdeasSection } from "@/components/abhyas/SavedIdeasSection";
-import { ActiveProjectsSection } from "@/components/abhyas/ActiveProjectsSection";
 import {
   selectProject,
   getSavedProjects,
   bookmarkProject,
   removeBookmark,
   startSavedProject,
-  getActiveProjects,
 } from "@/actions/agents";
 import type { SavedIdea, ActiveProject } from "@/actions/agents";
 import type { ProjectIdea } from "@/schemas/agents";
 
 const SESSION_KEY = "abhyas_search_results";
-const ACTIVE_PROJECTS_SESSION_KEY = "abhyas_active_projects";
 
 export function DashboardClient({ username }: { username: string }) {
   const router = useRouter();
@@ -29,32 +26,9 @@ export function DashboardClient({ username }: { username: string }) {
   const [error, setError] = useState<string | null>(null);
 
   const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>([]);
-  const [activeProjects, setActiveProjects] = useState<ActiveProject[]>([]);
   const [startingId, setStartingId] = useState<string | null>(null);
-  const [resumingProjectId, setResumingProjectId] = useState<string | null>(
-    null,
-  );
 
   const hasResults = projects.length > 0 || isLoading;
-
-  function getActiveProjectsFromSessionStorage(): ActiveProject[] {
-    if (typeof window === "undefined") {
-      return [];
-    }
-    try {
-      const stored = sessionStorage.getItem(ACTIVE_PROJECTS_SESSION_KEY);
-      if (!stored) {
-        return [];
-      }
-      const parsed = JSON.parse(stored);
-      if (!Array.isArray(parsed)) {
-        return [];
-      }
-      return parsed as ActiveProject[];
-    } catch {
-      return [];
-    }
-  }
 
   // Persist results to sessionStorage on every update so navigating back restores them
   // even if the user clicks a card before streaming finishes
@@ -93,37 +67,6 @@ export function DashboardClient({ username }: { username: string }) {
     } catch {
       // sessionStorage unavailable or corrupted — start fresh
     }
-  }, []);
-
-  // get active project on re-visit
-  useEffect(() => {
-    try {
-      const storedActiveProjects = sessionStorage.getItem(
-        ACTIVE_PROJECTS_SESSION_KEY,
-      );
-      if (storedActiveProjects) {
-        const projects = JSON.parse(storedActiveProjects) as ActiveProject[];
-        if (projects.length > 0) {
-          setActiveProjects(projects);
-        }
-      }
-    } catch {
-      // sessionStorage unavailable or corrupted — start fresh
-    }
-
-    getActiveProjects()
-      .then((projects) => {
-        // console.log(projects);
-
-        setActiveProjects(projects);
-        try {
-          sessionStorage.setItem(
-            ACTIVE_PROJECTS_SESSION_KEY,
-            JSON.stringify(projects),
-          );
-        } catch {}
-      })
-      .catch(() => {});
   }, []);
 
   const savedTitles = new Set(savedIdeas.map((s) => s.title));
@@ -270,23 +213,6 @@ export function DashboardClient({ username }: { username: string }) {
 
   return (
     <div className="space-y-10">
-      {activeProjects.length > 0 && (
-        <ActiveProjectsSection
-          projects={activeProjects}
-          onResume={(project) => {
-            setResumingProjectId(project.id);
-            router.push(`/projects/${project.id}`);
-          }}
-          resumingProjectId={resumingProjectId}
-        />
-      )}
-      <SavedIdeasSection
-        ideas={savedIdeas}
-        startingId={startingId}
-        onStart={handleStartSaved}
-        onRemove={handleRemoveSaved}
-      />
-
       {/* Topic entry: collapses to a compact strip once results arrive */}
       {!hasResults ? (
         <div className="space-y-5">
@@ -391,6 +317,12 @@ export function DashboardClient({ username }: { username: string }) {
           </div>
         </section>
       )}
+      <SavedIdeasSection
+        ideas={savedIdeas}
+        startingId={startingId}
+        onStart={handleStartSaved}
+        onRemove={handleRemoveSaved}
+      />
     </div>
   );
 }
