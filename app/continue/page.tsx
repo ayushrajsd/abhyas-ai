@@ -1,166 +1,45 @@
-"use client";
+import { createAuthClient } from "@/lib/supabase";
+import { redirect } from "next/navigation";
+import { ContinueClient } from "./ContinueClient";
+import { AppNavbar } from "@/components/abhyas/AppNavbar";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { ActiveProjectsSection } from "@/components/abhyas/ActiveProjectsSection";
+export default async function ContinuePage() {
+  const supabase = createAuthClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-import { getActiveProjects } from "@/actions/agents";
-import type { ActiveProject } from "@/actions/agents";
+  if (!session) redirect("/");
 
-const ACTIVE_PROJECTS_SESSION_KEY = "abhyas_active_projects";
+  const { data: user } = await supabase
+    .from("users")
+    .select("github_username, github_avatar, encrypted_api_key")
+    .eq("id", session.user.id)
+    .single();
 
-export default function ContinuePage() {
-  const router = useRouter();
-
-  const [activeProjects, setActiveProjects] = useState<ActiveProject[]>([]);
-  const [resumingProjectId, setResumingProjectId] = useState<string | null>(
-    null,
-  );
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // get active project on re-visit
-  useEffect(() => {
-    try {
-      const storedActiveProjects = sessionStorage.getItem(
-        ACTIVE_PROJECTS_SESSION_KEY,
-      );
-      if (storedActiveProjects) {
-        const projects = JSON.parse(storedActiveProjects) as ActiveProject[];
-        if (projects.length > 0) {
-          setActiveProjects(projects);
-        }
-      }
-    } catch {
-      // sessionStorage unavailable or corrupted — start fresh
-    }
-
-    getActiveProjects()
-      .then((projects) => {
-        // console.log(projects);
-
-        setActiveProjects(projects);
-        setLoading(false);
-        try {
-          sessionStorage.setItem(
-            ACTIVE_PROJECTS_SESSION_KEY,
-            JSON.stringify(projects),
-          );
-        } catch {}
-      })
-      .catch(() => {
-        setLoading(false);
-        setError("Could not load active projects. Please try again.");
-      });
-  }, []);
+  if (!user?.encrypted_api_key) redirect("/onboarding");
 
   return (
-    <main
-      className="min-h-screen "
-      style={{ backgroundColor: "f7f4ef", color: "1c1c2c" }}
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: "#f7f4ef", color: "#1c1c1c" }}
     >
-      <div className="max-w-4xl mx-auto px-8 py-16">
-        <nav
-          className="flex items-center justify-between px-8 py-5"
-          style={{ borderBottom: "1px solid #e8e3da" }}
-        >
-          <span className="font-serif text-lg font-semibold tracking-tight">
-            Abhyas<span style={{ color: "#3d6b4f" }}>.ai</span>
-          </span>
-
-          <div className="flex items-center gap-4 text-sm">
-            <button
-              onClick={() => router.push("/dashboard")}
-              style={{ color: "#6b6b6b" }}
-            >
-              Dashboard
-            </button>
-          </div>
-        </nav>
-        <div className="max-w-4xl mx-auto px-8 py-16 space-y-10">
-          <header className="space-y-2">
-            <p
-              className="text-xs font-semibold uppercase tracking-widest"
-              style={{ color: "#9b9b9b" }}
-            >
-              Continue learning
-            </p>
-
-            <h1
-              className="font-serif text-3xl font-semibold leading-snug"
-              style={{ color: "#1c1c1c" }}
-            >
-              Pick up where you left off.
-            </h1>
-
-            <p className="text-sm leading-relaxed" style={{ color: "#6b6b6b" }}>
-              Resume an active project and keep moving one milestone at a time.
-            </p>
-          </header>
-          {error && (
-            <div
-              role="alert"
-              className="rounded-xl px-5 py-4 text-sm border bg-red-50 border-red-200 text-red-800"
-            >
-              {error}
-            </div>
-          )}
-          <section>
-            {loading && (
-              <div
-                className="rounded-xl px-5 py-4 text-sm"
-                style={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e8e3da",
-                  color: "#6b6b6b",
-                }}
-              >
-                Loading active projects...
-              </div>
-            )}
-          </section>
-          {!loading && activeProjects.length > 0 && (
-            <ActiveProjectsSection
-              projects={activeProjects}
-              onResume={(project) => {
-                setResumingProjectId(project.id);
-                router.push(`/projects/${project.id}`);
-              }}
-              resumingProjectId={resumingProjectId}
-            />
-          )}{" "}
-          {!loading && activeProjects.length === 0 && !error && (
-            <div
-              className="rounded-xl border px-6 py-8 text-center space-y-4"
-              style={{ backgroundColor: "#ffffff", borderColor: "#e8e3da" }}
-            >
-              <div className="space-y-1">
-                <h2
-                  className="font-serif text-xl font-semibold"
-                  style={{ color: "#1c1c1c" }}
-                >
-                  No active projects yet.
-                </h2>
-
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "#6b6b6b" }}
-                >
-                  Start a project from the dashboard and it will appear here.
-                </p>
-              </div>
-
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="text-sm font-medium px-4 py-2 rounded-lg transition-opacity hover:opacity-80"
-                style={{ backgroundColor: "#3d6b4f", color: "#ffffff" }}
-              >
-                Go to dashboard
-              </button>
-            </div>
-          )}
-        </div>
+      <div
+        style={{
+          height: 3,
+          background:
+            "linear-gradient(90deg, #3d6b4f 0%, #7ab394 60%, #f7f4ef 100%)",
+        }}
+      >
+        <AppNavbar
+          userName={user.github_username}
+          activePage="continue"
+          avatarUrl={user.github_avatar}
+        />
+        <main className="max-w-4xl mx-auto px-8 py-16">
+          <ContinueClient />
+        </main>
       </div>
-    </main>
+    </div>
   );
 }

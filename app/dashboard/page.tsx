@@ -1,6 +1,7 @@
 import { createAuthClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "./DashboardClient";
+import { AppNavbar } from "@/components/abhyas/AppNavbar";
 
 export default async function DashboardPage() {
   const supabase = createAuthClient();
@@ -29,45 +30,17 @@ export default async function DashboardPage() {
           background:
             "linear-gradient(90deg, #3d6b4f 0%, #7ab394 60%, #f7f4ef 100%)",
         }}
-      />
-
-      <nav
-        className="flex items-center justify-between px-8 py-5"
-        style={{ borderBottom: "1px solid #e8e3da" }}
       >
-        <div>
-          <span className="font-serif text-lg font-semibold tracking-tight">
-            Abhyas<span style={{ color: "#3d6b4f" }}>.ai</span>
-          </span>
-        </div>
-        <div className="flex items-center w-1/4 justify-between">
-          <a
-            href="/continue"
-            className="text-sm font-medium transition-opacity hover:opacity-70"
-            style={{ color: "#3d6b4f" }}
-          >
-            Continue Learning
-          </a>
-          {user.github_avatar && (
-            <div className="flex items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={user.github_avatar}
-                alt={user.github_username ?? ""}
-                className="w-7 h-7 rounded-full"
-                style={{ border: "1.5px solid #ddd8cf" }}
-              />
-              <span className="text-sm" style={{ color: "#6b6b6b" }}>
-                @{user.github_username}
-              </span>
-            </div>
-          )}
-        </div>
-      </nav>
+        <AppNavbar
+          userName={user.github_username}
+          activePage="dashboard"
+          avatarUrl={user.github_avatar}
+        />
 
-      <main className="max-w-4xl mx-auto px-8 py-16">
-        <DashboardClient username={user.github_username ?? ""} />
-      </main>
+        <main className="max-w-4xl mx-auto px-8 py-16">
+          <DashboardClient username={user.github_username ?? ""} />
+        </main>
+      </div>
     </div>
   );
 }
