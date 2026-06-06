@@ -450,6 +450,15 @@ export async function completeTask(
   const db = createServerClient();
   const result = await handleCompleteTask(db, taskId, session.user.id);
 
+  if (result.outcome === "next_milestone") {
+    // generate tasks for next milestone
+    try {
+      await generateAndSaveTasks(result.milestoneId);
+    } catch (err) {
+      console.error("Task generation error:", err);
+    }
+  }
+
   // Revalidate relevant paths
   if (result.outcome === "next_task" || result.outcome === "next_milestone") {
     revalidatePath(`/projects/[id]/milestones/[milestoneId]`, "page");

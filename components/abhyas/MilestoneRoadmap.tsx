@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 type WarmupResource = {
   title: string;
@@ -422,7 +421,16 @@ function ActiveMilestoneCard({
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link> */}
-          <button onClick={handleBeginMilestoneClick} disabled={isOpening}>
+          <button
+            onClick={handleBeginMilestoneClick}
+            disabled={isOpening}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
+            style={{
+              backgroundColor: "#3d6b4f",
+              color: "#ffffff",
+              boxShadow: "0 2px 8px rgba(61,107,79,0.3)",
+            }}
+          >
             {isOpening ? "Starting" : "Begin Milestone"}
             {!isOpening ? (
               <svg
