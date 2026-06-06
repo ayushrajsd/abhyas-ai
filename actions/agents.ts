@@ -367,6 +367,10 @@ export async function generateAndSaveTasks(milestoneId: string): Promise<void> {
     : milestoneRow.projects;
   const user = userResult.data;
 
+  if (projectRow.user_id !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
   if (!user.encrypted_api_key || !user.api_provider) {
     throw new Error("API key not configured.");
   }

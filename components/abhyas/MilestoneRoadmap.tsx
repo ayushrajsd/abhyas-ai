@@ -403,24 +403,6 @@ function ActiveMilestoneCard({
 
         {/* CTA */}
         <div className="pt-1 flex items-center gap-3">
-          {/* <Link
-            href={`/projects/${projectId}/milestones/${milestone.id}`}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
-            style={{ backgroundColor: '#3d6b4f', color: '#ffffff', boxShadow: '0 2px 8px rgba(61,107,79,0.3)' }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#2d5a3f'
-              ;(e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 16px rgba(61,107,79,0.4)'
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#3d6b4f'
-              ;(e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 2px 8px rgba(61,107,79,0.3)'
-            }}
-          >
-            Begin Milestone
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link> */}
           <button
             onClick={handleBeginMilestoneClick}
             disabled={isOpening}
